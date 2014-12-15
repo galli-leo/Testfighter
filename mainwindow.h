@@ -11,6 +11,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonObject>
+#include "filedownloader.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,9 +26,10 @@ public:
     ~MainWindow();
 
 private slots:
-    void fileDownloaded(QNetworkReply* pReply);
+    void fileDownloaded();
 private:
     Ui::MainWindow *ui;
+    FileDownloader* fileDownloader;
     QNetworkAccessManager m_WebCtrl;
 };
 
