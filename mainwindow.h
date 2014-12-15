@@ -11,6 +11,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QFile>
 #include "filedownloader.h"
 
 namespace Ui {
@@ -27,10 +28,13 @@ public:
 
 private slots:
     void fileDownloaded();
+    void handleButton();
 private:
     Ui::MainWindow *ui;
     FileDownloader* fileDownloader;
     QNetworkAccessManager m_WebCtrl;
+    QJsonObject list;
+    void install(bool updating);
 };
 
 #endif // MAINWINDOW_H

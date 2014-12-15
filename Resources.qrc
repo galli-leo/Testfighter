@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>blue_button02.png</file>
+        <file>blue_button03.png</file>
+        <file>dropdown.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>E:/Downloads/uipack/Font/kenvector_future.ttf</file>
+        <file>E:/Downloads/uipack/Font/kenvector_future_thin.ttf</file>
+    </qresource>
+</RCC>

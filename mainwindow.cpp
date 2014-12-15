@@ -12,10 +12,83 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(fileDownloader, SIGNAL(downloaded()), SLOT(fileDownloaded()));
     ui->setupUi(this);
-    ui->comboBox->addItem("KnigthsOfSound");
+    ui->comboBox->addItem("Loading Items");
     ui->listWidget->addItem("15 of December 2014:\nRelease of Beta Launcher");
+    connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
 
 
+}
+void MainWindow::fileDownloaded()
+{
+    QByteArray m_DownloadedData = fileDownloader->downloadedData();
+    printf("data: %s\n",fileDownloader->downloadedData().data());
+    QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
+    printf(loadDoc.object()["test2"].toObject()["version"].toString().toLocal8Bit().data());
+    QStringList Items = loadDoc.object().keys();
+    Items.removeAt(0);
+    ui->comboBox->removeItem(0);
+    ui->comboBox->addItems(Items);
+    printf("\n %s", Items.at(0));
+    QFile loadFile("list.json");
+
+
+        printf_s("File does not exist");
+        loadFile.open(QIODevice::ReadWrite);
+
+
+
+     printf_s("File does not exist");
+    //QFile loadFile("list.json");
+    QByteArray list = loadFile.readAll();
+    QJsonDocument loadDoc2(QJsonDocument::fromJson(list));
+    QJsonObject root;
+    foreach(QString item, Items)
+    {
+        QJsonObject itemJ;
+        if(loadDoc2.object().keys().contains(item))
+        {
+            //All ready parsed
+            printf("\nparsed: %s", loadDoc.object()[item].toObject()["time"]);
+            printf("\nloaded: %s", itemJ["time"]);
+
+            itemJ = loadDoc2.object()[item].toObject();
+            if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
+            {
+                itemJ["bNeedsUpdate"] = true;
+            }
+            foreach(QString key, loadDoc.object()[item].toObject().keys())
+            {
+                itemJ[key] = loadDoc.object()[item].toObject()[key];
+            }
+        }else{
+            foreach(QString key, loadDoc.object()[item].toObject().keys())
+            {
+                itemJ[key] = loadDoc.object()[item].toObject()[key];
+                printf("\nkey: %s", key);
+            }
+            itemJ["installed"] = false;
+        }
+        root[item] = itemJ;
+    }
+    QJsonDocument writeDoc(root);
+    loadFile.resize(0);
+    loadFile.write(writeDoc.toJson());
+    this->list = root;
+
+}
+void MainWindow::handleButton()
+{
+    QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
+    if(item["installed"]==true)
+    {
+        //Find exe and launch, also ensure that steam is running or else launch it
+    }else{
+        install(false);
+    }
+}
+void MainWindow::install(bool updating)
+{
+    printf(\n"Installing");
 }
 
 MainWindow::~MainWindow()
@@ -23,11 +96,3 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::fileDownloaded()
-{
-    QByteArray m_DownloadedData = fileDownloader->downloadedData();
-    printf("data: %s",fileDownloader->downloadedData().data());
-    QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
-    printf(loadDoc.object()["test2"].toObject()["version"].toString().toLocal8Bit().data());
-
-}
