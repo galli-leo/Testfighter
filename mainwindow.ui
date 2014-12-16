@@ -74,7 +74,7 @@ color: rgb(255, 255, 255);*/
      <rect>
       <x>20</x>
       <y>180</y>
-      <width>193</width>
+      <width>201</width>
       <height>23</height>
      </rect>
     </property>
@@ -82,7 +82,7 @@ color: rgb(255, 255, 255);*/
      <number>0</number>
     </property>
     <property name="textVisible">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -99,7 +99,7 @@ color: rgb(255, 255, 255);*/
 font: 8pt &quot;:/fonts/E:/Downloads/uipack/Font/kenvector_future.ttf2&quot;;</string>
     </property>
     <property name="text">
-     <string>Downloading with 1.2 MB/s, 20 min remaining</string>
+     <string/>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
