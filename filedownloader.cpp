@@ -40,7 +40,10 @@ FileDownloader::~FileDownloader()
 
 void FileDownloader::fileDownloaded(QNetworkReply* pReply)
 {
-
+    if(this->shouldSave)
+    {
+        this->writeToFile->close();
+    }
     //emit a signal
     pReply->deleteLater();
     emit downloaded();
@@ -58,8 +61,13 @@ void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 
 void FileDownloader::readyRead()
 {
-    m_DownloadedData += reply->readAll();
+    QByteArray data = reply->readAll();
+    m_DownloadedData += data;
     if (this->shouldSave)
-        this->writeToFile->write(this->reply->readAll());
+    {
+        qDebug() << "Got data: " << data;
+        this->writeToFile->write(data);
+
+    }
 
 }

@@ -19,7 +19,7 @@ public:
     void start();
 signals:
     void progress(QString remainingTime, QString Speed, int percentage);
-
+    void finished();
 public slots:
 
 private slots:

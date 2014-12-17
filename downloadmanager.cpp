@@ -57,6 +57,7 @@ void DownloadManager::startDownloading()
 {
     this->time = QDateTime::currentMSecsSinceEpoch()/1000;
     FileDownloader* downloader = new FileDownloader(this->downloadingItems.at(this->currentDownloadIndex), this, this->downloadingPaths.at(this->currentDownloadIndex));
+
     connect(downloader, SIGNAL(downloadProg(qint64,qint64)), SLOT(downloadProg(qint64,qint64)));
     connect(downloader, SIGNAL(downloaded()), SLOT(downloadFinished()));
 
@@ -94,9 +95,8 @@ void DownloadManager::downloadFinished()
     {
         //WE are done
         printf("\nFinished downloading all items total dl: %s", QString::number(this->dlSize).toStdString().c_str());
-        QMessageBox* box = new QMessageBox();
-        box->setText("Finished downloading all items total dl: %s" + QString::number(this->dlSize));
-        box->setVisible(true);
+        emit finished();
+
     }
     else
     {

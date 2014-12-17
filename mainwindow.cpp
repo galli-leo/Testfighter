@@ -55,7 +55,7 @@ void MainWindow::fileDownloaded()
             itemJ = loadDoc2.object()[item].toObject();
             if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
             {
-                itemJ["bNeedsUpdate"] = true;
+                itemJ["bNeedsUpdate"] = "true";
             }
             foreach(QString key, loadDoc.object()[item].toObject().keys())
             {
@@ -67,20 +67,21 @@ void MainWindow::fileDownloaded()
                 itemJ[key] = loadDoc.object()[item].toObject()[key];
                 printf("\nkey: %s", key);
             }
-            itemJ["installed"] = false;
+            itemJ["installed"] = "false";
         }
         root[item] = itemJ;
     }
     QJsonDocument writeDoc(root);
     loadFile.resize(0);
     loadFile.write(writeDoc.toJson());
+    loadFile.close();
     this->list = root;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-    if(item["installed"]!= true)
+    if(item["installed"].toString()!= "true")
     {
         ui->pushButton->setText("Install");
     }
-    else if(item["bNeedsUpdate"]==true)
+    else if(item["bNeedsUpdate"].toString()=="true")
     {
         ui->pushButton->setText("Update");
     }
@@ -110,13 +111,11 @@ void MainWindow::install(bool updating, QString item)
        path.mkpath(rootPath + "/" + item);
 
     }
+    this->hashDownloader = new FileDownloader(QUrl("http://leonardogalli.ch/beta/builds/hash" + item + ".json"));
+    connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
     ui->label->setText("Inizializing");
     printf("Installing");
-    DownloadManager* manager = new DownloadManager(this);
-    manager->addItem(QUrl("http://leonardogalli.ch/beta/builds/SlashAnimationTest.zip"));
-    manager->addPath(rootPath + "/" + item + "/test.zip");
-    connect(manager, SIGNAL(progress(QString,QString,int)), SLOT(downloadProgCalc(QString,QString,int)));
-    manager->start();
+
 }
 void MainWindow::downloadProgCalc(QString remainingTime, QString Speed, int percentage)
 {
@@ -126,11 +125,11 @@ void MainWindow::downloadProgCalc(QString remainingTime, QString Speed, int perc
 void MainWindow::selectedChange(QString item)
 {
     QJsonObject itemJ = this->list[item].toObject();
-    if(itemJ["installed"]!= true)
+    if(itemJ["installed"].toString()!= "true")
     {
         ui->pushButton->setText("Install");
     }
-    else if(itemJ["bNeedsUpdate"]==true)
+    else if(itemJ["bNeedsUpdate"].toString()=="true")
     {
         ui->pushButton->setText("Update");
     }
@@ -138,6 +137,107 @@ void MainWindow::selectedChange(QString item)
     {
         ui->pushButton->setText("Launch");
     }
+}
+void MainWindow::hashDownloaded()
+{
+    QByteArray m_DownloadedData = hashDownloader->downloadedData();
+    printf("data: %s\n",hashDownloader->downloadedData().data());
+    QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
+    QJsonObject hashes = loadDoc.object();
+    QStringList toDownload;
+    QString item = ui->comboBox->currentText();
+    QDirIterator it("Apps/"+item, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString fileL = it.next();
+
+        QString relativeFile = fileL.replace("Apps/", "");
+        QString hash = this->hash("Apps/" + relativeFile);
+        if(!hashes.contains(relativeFile))
+        {
+            qDebug() << "Remove file: " << relativeFile;
+            QFile oldFile("Apps/" + relativeFile);
+            oldFile.remove();
+        }
+        else
+        {
+        qDebug() << "Hash of file: " << fileL << ", " << hash << " online says: " << hashes[relativeFile].toString();
+        if(hash == hashes[relativeFile].toString())
+        {
+            hashes.remove(relativeFile);
+        }
+
+        }
+    }
+    QString rootPath = "Apps";
+    DownloadManager* manager = new DownloadManager(this);
+    foreach(QString file, hashes.keys())
+    {
+
+        qDebug() << "Adding file: %s" << "http://leonardogalli.ch/beta/builds/" << file;
+        manager->addItem(QUrl("http://leonardogalli.ch/beta/builds/"+ file));
+        manager->addPath(rootPath + "/" + file);
+
+    }
+
+
+
+    connect(manager, SIGNAL(progress(QString,QString,int)), SLOT(downloadProgCalc(QString,QString,int)));
+    connect(manager, SIGNAL(finished()), SLOT(downloadManagerFinished()));
+    manager->start();
+}
+QString MainWindow::hash(QString file)
+{
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    QFile in(file);
+    qDebug() << "Hashing file: " << file;
+    if (in.open(QIODevice::ReadOnly)) {
+        char buf[2048];
+        int bytesRead;
+        qint64 overallBytesRead = 0;
+        if(in.size()<2048)
+        {
+            hash.addData(in.readAll());
+        }
+        else
+        {
+        while ((bytesRead = in.read(buf, 2048)) > 0) {
+            overallBytesRead += bytesRead;
+            hash.addData(buf, bytesRead);
+        }
+        }
+        in.close();
+
+    }
+    else
+    {
+
+    }
+    return hash.result().toHex();
+}
+void MainWindow::downloadManagerFinished()
+{
+    ui->label->setText("");
+    ui->progressBar->setValue(0);
+    this->list[ui->comboBox->currentText()].toObject().remove("installed");
+    this->list[ui->comboBox->currentText()].toObject()["installed"] = "true";
+
+    QString installed = this->list[ui->comboBox->currentText()].toObject()["installed"].toString();
+
+    this->list[ui->comboBox->currentText()].toObject().remove("bNeedsUpdate");
+    this->list[ui->comboBox->currentText()].toObject()["bNeedsUpdate"] = "false";
+    this->selectedChange(ui->comboBox->currentText());
+    QFile loadFile("list.json");
+    if(loadFile.open(QIODevice::ReadWrite))
+    {
+
+    }else{
+        qDebug() << "Failed to open list";
+    }
+    QJsonDocument writeDoc(this->list);
+    loadFile.resize(0);
+    loadFile.write(writeDoc.toJson());
+    loadFile.close();
+
 }
 
 MainWindow::~MainWindow()

@@ -14,6 +14,7 @@
 #include <QFile>
 #include <QDir>
 #include <QSysInfo>
+#include <QDirIterator>
 #include "downloadmanager.h"
 #include "filedownloader.h"
 
@@ -34,9 +35,13 @@ private slots:
     void handleButton();
     void downloadProgCalc(QString remainingTime, QString Speed, int percentage);
     void selectedChange(QString item);
+    void hashDownloaded();
+    void downloadManagerFinished();
+    QString hash(QString file);
 private:
     Ui::MainWindow *ui;
     FileDownloader* fileDownloader;
+    FileDownloader* hashDownloader;
     QNetworkAccessManager m_WebCtrl;
     QJsonObject list;
     void install(bool updating, QString item);
