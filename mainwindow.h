@@ -16,6 +16,7 @@
 #include <QSysInfo>
 #include <QDirIterator>
 #include <QProcess>
+#include <QMessageBox>
 #include "downloadmanager.h"
 #include "filedownloader.h"
 
@@ -47,6 +48,8 @@ private:
     QJsonObject list;
     bool isInstalled(QString item);
     QStringList needsUpdateList;
+    QStringList times;
+    QByteArray dlListData;
     void install(bool updating, QString item);
 };
 
