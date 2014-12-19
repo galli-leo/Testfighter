@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QSysInfo>
 #include <QDirIterator>
+#include <QProcess>
 #include "downloadmanager.h"
 #include "filedownloader.h"
 
@@ -44,6 +45,8 @@ private:
     FileDownloader* hashDownloader;
     QNetworkAccessManager m_WebCtrl;
     QJsonObject list;
+    bool isInstalled(QString item);
+    QStringList needsUpdateList;
     void install(bool updating, QString item);
 };
 

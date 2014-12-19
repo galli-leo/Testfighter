@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->comboBox->addItem("Loading Items");
     ui->listWidget->addItem("15 of December 2014:\nRelease of Beta Launcher");
+    ui->progressBar->setHidden(true);
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedChange(QString)));
 
@@ -56,6 +57,7 @@ void MainWindow::fileDownloaded()
             if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
             {
                 itemJ["bNeedsUpdate"] = "true";
+                this->needsUpdateList.append(item);
             }
             foreach(QString key, loadDoc.object()[item].toObject().keys())
             {
@@ -77,28 +79,45 @@ void MainWindow::fileDownloaded()
     loadFile.close();
     this->list = root;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-    if(item["installed"].toString()!= "true")
+    if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
     }
-    else if(item["bNeedsUpdate"].toString()=="true")
+    else if(this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
         ui->pushButton->setText("Update");
     }
-
+    ui->label_3->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
 }
 void MainWindow::handleButton()
 {
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-    if(item["installed"]==true)
+    if(this->isInstalled(ui->comboBox->currentText())&&!this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
         //Find exe and launch, also ensure that steam is running or else launch it
+        const QStringList nameFilter(ui->comboBox->currentText() + ".exe");
+        QDir dir("Apps/" + ui->comboBox->currentText());
+        QDirIterator dirIt("Apps/" + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
+        while (dirIt.hasNext()) {
+            dirIt.next();
+
+                    qDebug()<<dirIt.filePath();
+                    QProcess *myProcess = new QProcess(this);
+                    QStringList arguments;
+                    myProcess->start(dirIt.fileInfo().absoluteFilePath(), arguments);
+
+                    ui->centralWidget->setWindowState(Qt::WindowState::WindowMinimized);
+                       //myProcess->waitForFinished(-1);
+                    ui->centralWidget->setWindowState(Qt::WindowState::WindowActive);
+                    qDebug() <<  myProcess->exitCode();
+        }
     }else{
-        install(false, ui->comboBox->currentText());
+        install(this->needsUpdateList.contains(ui->comboBox->currentText()), ui->comboBox->currentText());
     }
 }
 void MainWindow::install(bool updating, QString item)
 {
+    ui->progressBar->setHidden(false);
     QString rootPath;
     rootPath = "Apps";
     if(!updating)
@@ -114,6 +133,7 @@ void MainWindow::install(bool updating, QString item)
     this->hashDownloader = new FileDownloader(QUrl("http://leonardogalli.ch/beta/builds/hash" + item + ".json"));
     connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
     ui->label->setText("Inizializing");
+    ui->label_3->setText("");
     printf("Installing");
 
 }
@@ -125,11 +145,11 @@ void MainWindow::downloadProgCalc(QString remainingTime, QString Speed, int perc
 void MainWindow::selectedChange(QString item)
 {
     QJsonObject itemJ = this->list[item].toObject();
-    if(itemJ["installed"].toString()!= "true")
+    if(!this->isInstalled((item)))
     {
         ui->pushButton->setText("Install");
     }
-    else if(itemJ["bNeedsUpdate"].toString()=="true")
+    else if(this->needsUpdateList.contains(item))
     {
         ui->pushButton->setText("Update");
     }
@@ -137,6 +157,7 @@ void MainWindow::selectedChange(QString item)
     {
         ui->pushButton->setText("Launch");
     }
+    ui->label_3->setText(this->list[item].toObject()["description"].toString());
 }
 void MainWindow::hashDownloaded()
 {
@@ -216,6 +237,8 @@ QString MainWindow::hash(QString file)
 }
 void MainWindow::downloadManagerFinished()
 {
+    this->needsUpdateList.removeAt(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
+    ui->progressBar->setHidden(true);
     ui->label->setText("");
     ui->progressBar->setValue(0);
     this->list[ui->comboBox->currentText()].toObject().remove("installed");
@@ -238,6 +261,10 @@ void MainWindow::downloadManagerFinished()
     loadFile.write(writeDoc.toJson());
     loadFile.close();
 
+}
+bool MainWindow::isInstalled(QString item)
+{
+        return QDir("Apps/" + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
 }
 
 MainWindow::~MainWindow()
