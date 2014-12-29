@@ -6,7 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QMessageBox>
+//#include <QMessageBox>
 #include "filedownloader.h"
 #include "mainwindow.h"
 class DownloadManager : public QObject
