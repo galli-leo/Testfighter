@@ -7,5 +7,5 @@ install:
 
 script:
   - qmake -project
-  - qmake BetaLauncher.pro
+  - qmake "QT += network" BetaLauncher.pro
   - make
