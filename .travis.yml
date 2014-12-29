@@ -7,5 +7,5 @@ install:
 
 script:
   - qmake -project
-  - qmake "QT += network" BetaLauncher.pro
+  - qmake "QT += core gui network" BetaLauncher.pro
   - make
