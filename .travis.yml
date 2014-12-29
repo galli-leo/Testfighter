@@ -4,5 +4,5 @@ install:
 
 script:
   - qmake -project
-  - qmake hello.pro
+  - qmake BetaLauncher.pro
   - make
