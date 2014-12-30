@@ -2,6 +2,7 @@
 #define DOWNLOADMANAGER_H
 
 #include <QObject>
+#include <QtCore/qmath.h>
 #include <QDateTime>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>

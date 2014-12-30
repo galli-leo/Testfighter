@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
+    /*QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
     QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( "http://www.google.com" ) ) );
 
     QEventLoop loop;
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     loop.exec();
 
     // Lets print the HTTP GET response.
-    qDebug( reply->readAll());
+    qDebug( reply->readAll());3*/
 
     MainWindow w;
     w.show();

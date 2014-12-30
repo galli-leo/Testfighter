@@ -185,7 +185,7 @@ QString DownloadManager::niceSpeed(qint64 speed)
 /* round number n to d decimal points */
 double DownloadManager::round(double n, unsigned d)
 {
-      return floor(n * pow(10., d) + .5) / pow(10., d);
+      return qFloor(n * qPow(10., d) + .5) / qPow(10., d);
 }
 
 void DownloadManager::addPath(QString path)

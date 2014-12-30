@@ -34,12 +34,12 @@ void MainWindow::fileDownloaded()
     QFile loadFile("list.json");
 
 
-        printf_s("File does not exist");
+        printf("File does not exist");
         loadFile.open(QIODevice::ReadWrite);
 
 
 
-     printf_s("File does not exist");
+     printf("File does not exist");
     //QFile loadFile("list.json");
     QByteArray list = loadFile.readAll();
     QJsonDocument loadDoc2(QJsonDocument::fromJson(list));
@@ -50,8 +50,8 @@ void MainWindow::fileDownloaded()
         if(loadDoc2.object().keys().contains(item))
         {
             //All ready parsed
-            printf("\nparsed: %s", loadDoc.object()[item].toObject()["time"]);
-            printf("\nloaded: %s", itemJ["time"]);
+            //printf("\nparsed: %s", loadDoc.object()[item].toObject()["time"]);
+            //printf("\nloaded: %s", itemJ["time"]);
 
             itemJ = loadDoc2.object()[item].toObject();
             if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
@@ -71,7 +71,7 @@ void MainWindow::fileDownloaded()
             foreach(QString key, loadDoc.object()[item].toObject().keys())
             {
                 itemJ[key] = loadDoc.object()[item].toObject()[key];
-                printf("\nkey: %s", key);
+                //printf("\nkey: %s", key);
             }
             itemJ["installed"] = "false";
         }
@@ -112,9 +112,9 @@ void MainWindow::handleButton()
                     QStringList arguments;
                     myProcess->start(dirIt.fileInfo().absoluteFilePath(), arguments);
 
-                    ui->centralWidget->setWindowState(Qt::WindowState::WindowMinimized);
+                    ui->centralWidget->hide();
                     myProcess->waitForFinished(-1);
-                    ui->centralWidget->setWindowState(Qt::WindowState::WindowActive);
+                    ui->centralWidget->show();
                     qDebug() <<  myProcess->errorString();
                     myProcess->dumpObjectInfo();
         }
@@ -135,9 +135,9 @@ void MainWindow::handleButton()
                             QStringList arguments;
                             myProcess->start(dirIt.fileInfo().absoluteFilePath(), arguments);
 
-                            ui->centralWidget->setWindowState(Qt::WindowState::WindowMinimized);
+                            ui->centralWidget->hide();
                             myProcess->waitForFinished(-1);
-                            ui->centralWidget->setWindowState(Qt::WindowState::WindowActive);
+                            ui->centralWidget->show();
                             qDebug() <<  myProcess->errorString();
                             myProcess->dumpObjectInfo();
                 }
