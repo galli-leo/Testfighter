@@ -65,7 +65,7 @@ void DownloadManager::startDownloading()
 void DownloadManager::downloadProg(qint64 bytesReceived, qint64 bytesTotal)
 {
     this->times++;
-    qDebug() << bytesTotal;
+    printf("Bytes total: %i", (int)bytesTotal);
     qint64 bytesDiff = bytesReceived - this->lastDlSize;
     this->dlSize += bytesDiff;
     this->lastDlSize = bytesReceived;
