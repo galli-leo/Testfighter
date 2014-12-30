@@ -286,12 +286,12 @@ void MainWindow::downloadManagerFinished()
     ui->label->setText("");
     ui->progressBar->setValue(0);
     this->list[ui->comboBox->currentText()].toObject().remove("installed");
-    this->list[ui->comboBox->currentText()].toObject()["installed"] = "true";
+    //this->list[ui->comboBox->currentText()].toObject()["installed"] = "true";
 
     QString installed = this->list[ui->comboBox->currentText()].toObject()["installed"].toString();
 
     this->list[ui->comboBox->currentText()].toObject().remove("bNeedsUpdate");
-    this->list[ui->comboBox->currentText()].toObject()["bNeedsUpdate"] = "false";
+    //this->list[ui->comboBox->currentText()].toObject()["bNeedsUpdate"] = "false";
     //this->selectedChange(ui->comboBox->currentText());
     QFile loadFile("list.json");
 
