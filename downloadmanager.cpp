@@ -65,6 +65,7 @@ void DownloadManager::startDownloading()
 void DownloadManager::downloadProg(qint64 bytesReceived, qint64 bytesTotal)
 {
     this->times++;
+    qDebug() << bytesTotal;
     qint64 bytesDiff = bytesReceived - this->lastDlSize;
     this->dlSize += bytesDiff;
     this->lastDlSize = bytesReceived;
@@ -76,7 +77,7 @@ void DownloadManager::downloadProg(qint64 bytesReceived, qint64 bytesTotal)
         qint64 remainingDl = this->totalSize - this->dlSize;
         qint64 speed = ((this->dlSize/timeDiff)); //Download Speed in B/s
         int remainingTimeSec = remainingDl/speed;
-        printf("\nRemaining time: %s, times: %i, percentage: %i", readableTime(remainingTimeSec).toStdString().c_str(), this->times, (this->dlSize/this->totalSize)*100);
+        //printf("\nRemaining time: %s, times: %i, percentage: %i", readableTime(remainingTimeSec).toStdString().c_str(), this->times, (this->dlSize/this->totalSize)*100);
         //We only want every 10th time to update ui
         if(this->times == 10)
         {

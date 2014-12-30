@@ -25,7 +25,7 @@ void MainWindow::fileDownloaded()
     QByteArray m_DownloadedData = fileDownloader->downloadedData();
     printf("data: %s\n",fileDownloader->downloadedData().data());
     QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
-    printf(loadDoc.object()["test2"].toObject()["version"].toString().toLocal8Bit().data());
+    //printf(loadDoc.object()["test2"].toObject()["version"].toString().toLocal8Bit().data());
     QStringList Items = loadDoc.object().keys();
     //Items.removeAt(0);
     ui->comboBox->removeItem(0);

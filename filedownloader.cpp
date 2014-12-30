@@ -3,6 +3,7 @@
 FileDownloader::FileDownloader(QUrl imageUrl, QObject *parent, QString filePath) :
     QObject(parent)
 {
+    shouldSave = false;
     connect(&m_WebCtrl, SIGNAL(finished(QNetworkReply*)),
                 SLOT(fileDownloaded(QNetworkReply*)));
 

@@ -36,7 +36,7 @@ private:
     QFile* writeToFile;
     QByteArray m_DownloadedData;
     QNetworkReply* reply;
-    bool shouldSave = false;
+    bool shouldSave;
 
 };
 
