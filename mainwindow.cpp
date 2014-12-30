@@ -56,7 +56,7 @@ void MainWindow::fileDownloaded()
             itemJ = loadDoc2.object()[item].toObject();
             if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
             {
-                itemJ["bNeedsUpdate"] = "true";
+                //itemJ["bNeedsUpdate"] = "true";
                 this->needsUpdateList.append(item);
                 this->times.append(loadDoc.object()[item].toObject()["time"].toString());
             }
@@ -73,7 +73,7 @@ void MainWindow::fileDownloaded()
                 itemJ[key] = loadDoc.object()[item].toObject()[key];
                 //printf("\nkey: %s", key);
             }
-            itemJ["installed"] = "false";
+            //itemJ["installed"] = "false";
         }
         root[item] = itemJ;
     }
