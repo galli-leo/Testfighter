@@ -17,6 +17,7 @@
 #include <QDirIterator>
 #include <QProcess>
 #include <QDebug>
+#include <QCryptographicHash>
 #include <QMessageBox>
 #include "downloadmanager.h"
 #include "filedownloader.h"
