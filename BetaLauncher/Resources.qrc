@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>blue_button02.png</file>
+        <file>blue_button03.png</file>
+        <file>dropdown.png</file>
+    </qresource>
+</RCC>
