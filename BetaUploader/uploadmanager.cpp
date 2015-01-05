@@ -22,6 +22,7 @@ void UploadManager::start()
     this->UlSize = 0;
     this->lastUlSize = 0;
     this->times = 0;
+    lastUlNice = 0;
     //Get all headers to get content length
 
     foreach(QString url, this->itemsToUpload)
@@ -34,10 +35,19 @@ void UploadManager::start()
     qDebug() << "Total size to upload: " << this->totalSize;
     this->networkManager = new QNetworkAccessManager(this);
     this->startUpload(0);
-    this->time = QDateTime::currentMSecsSinceEpoch()/1000;
+    this->time = (double)QDateTime::currentMSecsSinceEpoch()/1000;
+    lastTimeNice = (double)QDateTime::currentMSecsSinceEpoch()/1000;
+    lastTime = 0;
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(5000);
 
 }
-
+void UploadManager::update()
+{
+    lastUlNice = 0;
+    lastTimeNice = (double)QDateTime::currentMSecsSinceEpoch()/1000;
+}
 QString UploadManager::readableTime(int secconds)
 {
     //Break into sec min hours days
@@ -101,11 +111,11 @@ QString UploadManager::niceSpeed(qint64 speed)
     int bytes = speed;
     float kbytes = (float)speed/1000;
     float mbytes = (float)speed/1000000;
-    if(mbytes >= 0.1)
+    if(mbytes >= 1)
     {
         return QString::number(round(mbytes, 2)) + " MB/s";
     }
-    else if(kbytes >= 0.1)
+    else if(kbytes >= 1)
     {
         return QString::number(round(kbytes, 2)) + " KB/s";
     }
@@ -123,6 +133,7 @@ double UploadManager::round(double n, unsigned d)
 
 void UploadManager::startUpload(int index)
 {
+    lastUlSize = 0;
     QFile *file =  new QFile(this->itemsToUpload.at(index));
     QUrl url("http://leonardogalli.ch/beta/upload_single.php");
     QNetworkRequest request(url);
@@ -165,13 +176,18 @@ void UploadManager::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
     qint64 bytesDiff = bytesSent - this->lastUlSize;
     this->UlSize += bytesDiff;
     this->lastUlSize = bytesSent;
-    int timeDiff = QDateTime::currentMSecsSinceEpoch()/1000-this->time;
-    if(timeDiff!= 0 && bytesSent!=0 && bytesTotal != 0)
-    {
-        qDebug() << "Uploadspeed: " << ((this->UlSize/timeDiff));
+    double currentTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
+    double timeDiff = currentTime-this->lastTimeNice;
+    lastUlNice += bytesDiff;
+
+    qDebug() << timeDiff;
+    qDebug() << currentTime;
+    qDebug() << lastTimeNice;
+    if(timeDiff != 0.0){
+        qDebug() << "Uploadspeed: " << ((bytesDiff/timeDiff));
 
         qint64 remainingUl = this->totalSize - this->UlSize;
-        qint64 speed = ((this->UlSize/timeDiff)); //Download Speed in B/s
+        qint64 speed = ((lastUlNice/timeDiff)); //Download Speed in B/s
         int remainingTimeSec = remainingUl/speed;
         qDebug() << "Remaining time: " <<  this->readableTime(remainingTimeSec) << " percentage: " << (this->UlSize/this->totalSize)*100 << " speed: " << this->niceSpeed(speed);
         float percentage = ((float)this->UlSize/(float)this->totalSize)*100;
@@ -183,20 +199,33 @@ void UploadManager::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
 
     file.open(QIODevice::ReadOnly);
     qDebug() << this->currentFile->pos();
+    lastTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
 
 }
 void UploadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
     qDebug() << "Bytes received: " << bytesReceived << " of total: " << bytesTotal;
+    qDebug() << "Time since last upload: " << (double)QDateTime::currentMSecsSinceEpoch()/1000-lastTime;
+    totalTime += ((double)QDateTime::currentMSecsSinceEpoch()/1000-lastTime);
 }
 
 void UploadManager::finished()
 {
     this->currentUploadIndex++;
-    qDebug() << currentReply->readAll();
+    QByteArray data = currentReply->readAll();
+    qDebug() << data;
+    QString dataString = QString(data);
+    if(!dataString.contains("has been uploaded"))
+    {
+        emit uploadFinished();
+        qDebug() << "There has been an error while uploading: " << data;
+    }
+    else
+    {
     currentReply->deleteLater();
     if(this->currentUploadIndex >= this->itemsToUpload.count())
     {
+        qDebug() << "Total time lost: " << totalTime;
         emit uploadFinished();
 
     }
@@ -204,6 +233,6 @@ void UploadManager::finished()
     {
         this->startUpload(this->currentUploadIndex);
     }
-    qDebug() << this->currentReply->readAll();
     qDebug() << this->currentUploadIndex;
+    }
 }

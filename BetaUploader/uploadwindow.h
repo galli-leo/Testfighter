@@ -40,19 +40,22 @@ public:
 private slots:
     void uploadFin();
     void uploadProgress(QString ulSpeed, QString timeRemaining, float percentage);
+    void on_pushButton_clicked();
+
 private:
     Ui::UploadWindow *ui;
     QJsonObject options;
     QJsonObject list;
+    QJsonObject hashes;
+    QString hash(QString file);
     void setupFields();
     void addField(QString type, QJsonObject field, int& row, int& column);
     bool isInit;
     bool uploadFinished;
     void initUpload();
     void buildSubmit();
-    QHash<QString, QLineEdit> lineEdits;
-    QHash<QString, QCheckBox> checkboxes;
-    QHash<QString, QTextEdit> textEdits;
+    QHash<QString, QWidget*> edits;
+    QString keyForName(QString name);
 };
 
 #endif // UPLOADWINDOW_H

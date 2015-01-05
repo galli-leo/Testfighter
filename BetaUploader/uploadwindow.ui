@@ -45,7 +45,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
     <property name="textVisible">
      <bool>false</bool>
@@ -61,7 +61,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Uploading with 0.2 MB/s, 2 minutes remaining</string>
+     <string>Initializing</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">

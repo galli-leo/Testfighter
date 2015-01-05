@@ -14,6 +14,7 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <math.h>
+#include <QTimer>
 class UploadManager : public QObject
 {
     Q_OBJECT
@@ -42,12 +43,17 @@ private:
     QFile* currentFile;
     void startUpload(int index);
     QNetworkReply* currentReply;
-    int time;
+    double time;
     QNetworkAccessManager *networkManager;
+    double lastTime;
+    double totalTime;
+    qint64 lastUlNice;
+    double lastTimeNice;
 private slots:
     void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
     void finished();
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void update();
 };
 
 #endif // UPLOADMANAGER_H

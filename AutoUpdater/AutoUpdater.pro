@@ -21,3 +21,8 @@ SOURCES += main.cpp\
 HEADERS  += updatingwindow.h
 
 FORMS    += updatingwindow.ui
+
+unix|win32: LIBS += -L$$PWD/lib/ -lquazip
+
+INCLUDEPATH += $$PWD/include
+DEPENDPATH += $$PWD/include
