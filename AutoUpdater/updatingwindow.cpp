@@ -1,8 +1,8 @@
 #include "updatingwindow.h"
 #include "ui_updatingwindow.h"
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-#include <quazip/quazipfileinfo.h>
+#include "quazip.h"
+#include "quazipfile.h"
+#include "quazipfileinfo.h"
 
 
 UpdatingWindow::UpdatingWindow(QWidget *parent) :

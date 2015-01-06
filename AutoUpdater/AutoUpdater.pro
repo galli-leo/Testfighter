@@ -10,11 +10,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AutoUpdater
 TEMPLATE = app
-INCLUDEPATH -= /Users/leonardogalli/zlib/include
-INCLUDEPATH += $$_PRO_FILE_PWD_/include
-LIBS += -lz
+INCLUDEPATH += $$PWD/zlib/include
 
-LIBS += $$_PRO_FILE_PWD_/lib/libquazip.dylib
+
+unix|win32: LIBS += $$PWD/zlib/lib/zlib.lib
+unix|win32: LIBS += $$PWD/quazip/lib/quazip.lib
+
+INCLUDEPATH += $$PWD/quazip/include
+
+
+unix:LIBS += -lz
+
+
 SOURCES += main.cpp\
         updatingwindow.cpp
 
@@ -22,7 +29,4 @@ HEADERS  += updatingwindow.h
 
 FORMS    += updatingwindow.ui
 
-unix|win32: LIBS += -L$$PWD/lib/ -lquazip
 
-INCLUDEPATH += $$PWD/include
-DEPENDPATH += $$PWD/include
