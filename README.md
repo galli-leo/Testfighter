@@ -1,7 +1,7 @@
 BetaLauncher
 ============
 
-[![Build Status](https://travis-ci.org/DJLectr0/BetaLauncher.svg)](https://travis-ci.org/DJLectr0/BetaLauncher)
+[![Build Status](https://travis-ci.org/DJLectr0/Testfighter.svg)](https://travis-ci.org/DJLectr0/BetaLauncher)
 
 This is a rudementary implementation of Testflight on desktop.
 
