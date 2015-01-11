@@ -24,11 +24,13 @@ void UploadManager::start()
     this->times = 0;
     lastUlNice = 0;
     //Get all headers to get content length
-
+    qDebug() << "first: " << itemsToUpload.at(0);
     foreach(QString url, this->itemsToUpload)
     {
        QFile file(url);
        file.open(QIODevice::ReadOnly);
+       qDebug() << "lol";
+       qDebug() << url;
        this->totalSize += file.size()+360; //360 is the size of the post request without any file so we have to add it
        file.close();
     }
@@ -142,7 +144,7 @@ void UploadManager::startUpload(int index)
     QHttpPart loginPart;
     /* password */
     loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
-    loginPart.setBody("pass");
+    loginPart.setBody("testfighter2015");
     multiPart->append(loginPart);
     loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"path\""));
     loginPart.setBody(this->paths.at(index).toLocal8Bit());

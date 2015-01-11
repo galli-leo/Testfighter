@@ -10,11 +10,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AutoUpdater
 TEMPLATE = app
+CONFIG += staticlib
 INCLUDEPATH += $$PWD/zlib/include
+DEFINES += QUAZIP_STATIC
 
-
-unix|win32: LIBS += $$PWD/zlib/lib/zlib.lib
-unix|win32: LIBS += $$PWD/quazip/lib/quazip.lib
+unix|win32: LIBS += -L$$PWD/zlib/lib/ -lzlib
+unix|win32: LIBS += -L$$PWD/quazip/lib -lquazip
 
 INCLUDEPATH += $$PWD/quazip/include
 
