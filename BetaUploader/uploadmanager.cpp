@@ -221,6 +221,8 @@ void UploadManager::finished()
     {
         emit uploadFinished();
         qDebug() << "There has been an error while uploading: " << data;
+
+        QMessageBox::critical(0,"Error while uploading", "There has been an error while uploading: " + data);
     }
     else
     {

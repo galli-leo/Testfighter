@@ -15,6 +15,7 @@
 #include <QHttpPart>
 #include <math.h>
 #include <QTimer>
+#include <QMessageBox>
 class UploadManager : public QObject
 {
     Q_OBJECT
