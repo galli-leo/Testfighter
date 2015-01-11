@@ -14,6 +14,10 @@ AppData* AppData::Instance()
 AppData::AppData(QObject *parent) : QObject(parent)
 {
     //Load options.json
+    QFile file("settings.json");
+    file.open(QIODevice::ReadWrite);
+    QJsonDocument loadDoc = QJsonDocument::fromJson(file.readAll());
+    settings = loadDoc.object();
 
 #ifdef Q_OS_MAC
     appExtension = ".app";
@@ -25,11 +29,12 @@ AppData::AppData(QObject *parent) : QObject(parent)
 QString AppData::appPath(QString path)
 {
     QString apppath = "";
-    if(apppath.at(apppath.length()-1)=="/")
+    if(path.at(path.length()-1)=='/')
     {
-        apppath.reserve(apppath.length()-1);
+        path.resize(path.length()-1);
     }
-    QString appName = path.split("/").last;
+
+    QString appName = path.split("/").last();
 
 #ifdef Q_OS_MAC
     apppath = path+".app/Contents/MacOS/" + appName;

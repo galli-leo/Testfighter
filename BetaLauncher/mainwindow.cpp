@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
 
-    QUrl imageUrl("http://leonardogalli.ch/beta/list.json");
+    QUrl imageUrl(AppData::Instance()->settings["url"].toString() + "list.json");
     fileDownloader = new FileDownloader(imageUrl, this);
 
     connect(fileDownloader, SIGNAL(downloaded()), SLOT(fileDownloaded()));
@@ -163,7 +163,7 @@ void MainWindow::install(bool updating, QString item)
        path.mkpath(rootPath + "/" + item);
 
     }
-    this->hashDownloader = new FileDownloader(QUrl("http://leonardogalli.ch/beta/builds/hash" + item + ".json"));
+    this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hash" + item + ".json"));
     connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
     ui->label->setText("Inizializing");
@@ -236,7 +236,7 @@ void MainWindow::hashDownloaded()
     {
         count++;
         qDebug() << "Adding file: %s" << "http://leonardogalli.ch/beta/builds/" << file;
-        manager->addItem(QUrl("http://leonardogalli.ch/beta/builds/"+ file));
+        manager->addItem(QUrl(AppData::Instance()->settings["url"].toString() + "builds/"+ file));
         manager->addPath(rootPath + "/" + file);
 
     }
