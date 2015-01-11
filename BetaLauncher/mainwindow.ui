@@ -99,7 +99,7 @@ color: rgb(255, 255, 255);*/
     </property>
     <property name="styleSheet">
      <string notr="true">
-font: 8pt &quot;:/fonts/E:/Downloads/uipack/Font/kenvector_future.ttf2&quot;;</string>
+/*font: 8pt &quot;:/fonts/E:/Downloads/uipack/Font/kenvector_future.ttf2&quot;;*/</string>
     </property>
     <property name="text">
      <string/>

@@ -55,6 +55,7 @@ private:
     QByteArray dlListData;
     void install(bool updating, QString item);
     void afterInstall(QString item);
+    QString appDir;
 };
 
 #endif // MAINWINDOW_H

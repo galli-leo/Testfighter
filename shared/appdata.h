@@ -6,6 +6,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStringList>
+#include <QDesktopServices>
+#include <QDir>
+#include <QCoreApplication>
 
 class AppData : public QObject
 {
@@ -15,6 +18,7 @@ public:
     QString appPath(QString path);
     QString appExtension;
     QJsonObject settings;
+    QString appDirectory;
 
 signals:
 

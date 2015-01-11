@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
-
+    appDir = AppData::Instance()->appDirectory;
     QUrl imageUrl(AppData::Instance()->settings["url"].toString() + "list.json");
     fileDownloader = new FileDownloader(imageUrl, this);
 
@@ -101,9 +101,10 @@ void MainWindow::handleButton()
     if(this->isInstalled(ui->comboBox->currentText())&&!this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
         //Find exe and launch, also ensure that steam is running or else launch it
-        const QStringList nameFilter(ui->comboBox->currentText() + ".exe");
-        QDir dir("Apps/" + ui->comboBox->currentText());
-        QDirIterator dirIt("Apps/" + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
+        const QStringList nameFilter( ui->comboBox->currentText()+AppData::Instance()->appExtension);
+        QDir dir(AppData::Instance()->appPath( ui->comboBox->currentText()));
+        qDebug() << AppData::Instance()->appDirectory + ui->comboBox->currentText() << " " << ui->comboBox->currentText();
+        QDirIterator dirIt( AppData::Instance()->appDirectory + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
         while (dirIt.hasNext()) {
             dirIt.next();
 
@@ -124,9 +125,9 @@ void MainWindow::handleButton()
             if (QMessageBox::No == QMessageBox(QMessageBox::Information, "Update available", "Do you want to update " + ui->comboBox->currentText() + "?", QMessageBox::Yes|QMessageBox::No).exec())
             {
                 //Find exe and launch, also ensure that steam is running or else launch it
-                const QStringList nameFilter(ui->comboBox->currentText() + ".exe");
-                QDir dir("Apps/" + ui->comboBox->currentText());
-                QDirIterator dirIt("Apps/" + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
+                const QStringList nameFilter(AppData::Instance()->appPath( ui->comboBox->currentText()));
+                QDir dir(appDir + ui->comboBox->currentText());
+                QDirIterator dirIt(appDir + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
                 while (dirIt.hasNext()) {
                     dirIt.next();
 
@@ -152,17 +153,11 @@ void MainWindow::install(bool updating, QString item)
 
     ui->progressBar->setHidden(false);
     QString rootPath;
-    rootPath = "Apps";
+    rootPath = appDir;
     if(!updating)
-    {
 
-#ifdef Q_WS_MACX
-        rootPath = QDesktopServices::storageLocation( QDesktopServices::DataLocation )+"BetaLauncher";
-#endif
-        QDir path = QDir("");
-       path.mkpath(rootPath + "/" + item);
 
-    }
+
     this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hash" + item + ".json"));
     connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
@@ -182,7 +177,7 @@ void MainWindow::selectedChange(QString item)
     if(!this->isInstalled((item)))
     {
         ui->pushButton->setText("Install");
-        ui->label_3->setText("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        ui->label_3->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
 
     }
     else if(this->needsUpdateList.contains(item))
@@ -207,16 +202,17 @@ void MainWindow::hashDownloaded()
     QJsonObject hashes = loadDoc.object();
     QStringList toDownload;
     QString item = ui->comboBox->currentText();
-    QDirIterator it("Apps/"+item, QDir::Files, QDirIterator::Subdirectories);
+
+    QDirIterator it(appDir+item, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString fileL = it.next();
 
-        QString relativeFile = fileL.replace("Apps/", "");
-        QString hash = this->hash("Apps/" + relativeFile);
+        QString relativeFile = fileL.replace(appDir, "");
+        QString hash = this->hash(appDir + relativeFile);
         if(!hashes.contains(relativeFile))
         {
             qDebug() << "Remove file: " << relativeFile;
-            QFile oldFile("Apps/" + relativeFile);
+            QFile oldFile(appDir + relativeFile);
             oldFile.remove();
         }
         else
@@ -229,7 +225,7 @@ void MainWindow::hashDownloaded()
 
         }
     }
-    QString rootPath = "Apps";
+    QString rootPath = appDir;
     DownloadManager* manager = new DownloadManager(this);
     int count = 0;
     foreach(QString file, hashes.keys())
@@ -281,42 +277,28 @@ QString MainWindow::hash(QString file)
 }
 void MainWindow::downloadManagerFinished()
 {
-
+#ifdef Q_OS_MAC
+    QString exePath = AppData::Instance()->appPath( AppData::Instance()->appDirectory + ui->comboBox->currentText());
+    QFile file(exePath);
+    file.setPermissions(QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner);
+    qDebug() << file.permissions();
+    qDebug() << exePath;
+#endif
     ui->progressBar->setHidden(true);
     ui->label->setText("");
     ui->progressBar->setValue(0);
-    this->list[ui->comboBox->currentText()].toObject().remove("installed");
-    //this->list[ui->comboBox->currentText()].toObject()["installed"] = "true";
 
-    QString installed = this->list[ui->comboBox->currentText()].toObject()["installed"].toString();
-
-    this->list[ui->comboBox->currentText()].toObject().remove("bNeedsUpdate");
-    //this->list[ui->comboBox->currentText()].toObject()["bNeedsUpdate"] = "false";
-    //this->selectedChange(ui->comboBox->currentText());
-    QFile loadFile("list.json");
-
-    if(loadFile.open(QIODevice::ReadWrite))
-    {
-
-    }else{
-        qDebug() << "Failed to open list";
-    }
 
 
     ui->pushButton->setEnabled(true);
-    this->list[ui->comboBox->currentText()].toObject().remove("time");
-    this->list[ui->comboBox->currentText()].toObject()["time"] = this->times.at(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
+
     this->needsUpdateList.removeAt(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
     this->selectedChange(ui->comboBox->currentText());
-    QJsonDocument writeDoc(this->list);
-    loadFile.resize(0);
-    loadFile.write(writeDoc.toJson());
-    loadFile.close();
 
 }
 bool MainWindow::isInstalled(QString item)
 {
-        return QDir("Apps/" + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
+        return QDir(AppData::Instance()->appDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
 }
 
 MainWindow::~MainWindow()

@@ -169,11 +169,11 @@ QString DownloadManager::niceSpeed(qint64 speed)
     int bytes = speed;
     float kbytes = (float)speed/1000;
     float mbytes = (float)speed/1000000;
-    if(mbytes != 0)
+    if(mbytes >= 1)
     {
         return QString::number(round(mbytes, 1)) + " MB/s";
     }
-    else if(kbytes != 0)
+    else if(kbytes >= 1)
     {
         return QString::number(round(kbytes, 1)) + " KB/s";
     }
