@@ -10,16 +10,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = BetaLauncher
 TEMPLATE = app
-
+INCLUDEPATH += $$PWD/../shared
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     filedownloader.cpp \
-    downloadmanager.cpp
+    downloadmanager.cpp \
+    ../shared/appdata.cpp
 
 HEADERS  += mainwindow.h \
     filedownloader.h \
-    downloadmanager.h
+    downloadmanager.h \
+    ../shared/appdata.h
 
 FORMS    += mainwindow.ui
 

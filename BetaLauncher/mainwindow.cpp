@@ -324,3 +324,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::afterInstall(QString item)
+{
+    //Fetch dependency and install
+    QString depend = this->list[item].toObject()["prereq"].toString();
+    QDirIterator it("", QDir::NoFilter, QDirIterator::Subdirectories);
+
+    while(it.hasNext())
+    {
+        QString filePath = it.next();
+        QFile file(filePath);
+        QFileInfo info(file);
+        if(info.fileName()==AppData::Instance()->appExtension){
+
+        }
+    }
+}

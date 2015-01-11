@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include "downloadmanager.h"
 #include "filedownloader.h"
+#include "appdata.h"
 
 namespace Ui {
 class MainWindow;
@@ -53,6 +54,7 @@ private:
     QStringList times;
     QByteArray dlListData;
     void install(bool updating, QString item);
+    void afterInstall(QString item);
 };
 
 #endif // MAINWINDOW_H
