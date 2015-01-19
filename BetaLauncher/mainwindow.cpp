@@ -313,7 +313,7 @@ void MainWindow::launch()
                 if(dirIt.filePath().contains(".app")){
                     realPath += "/Contents/MacOS/" + ui->comboBox->currentText();
                     QFile file(realPath);
-                    //Set the permissions so we are sure we can launch it, dl it usually results in no permissions
+                    //Set the permissions so we are sure we can launch it, dling it usually results in no permissions
                     file.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ReadOwner | QFile::ReadOther | QFile::ReadUser);
                 }
 
