@@ -10,16 +10,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = BetaUploader
 TEMPLATE = app
-
+INCLUDEPATH += ../shared/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     uploadwindow.cpp \
-    uploadmanager.cpp
+    uploadmanager.cpp \
+    ../shared/appdata.cpp
 
 HEADERS  += mainwindow.h \
     uploadwindow.h \
-    uploadmanager.h
+    uploadmanager.h \
+    ../shared/appdata.h
 
 FORMS    += mainwindow.ui \
     uploadwindow.ui

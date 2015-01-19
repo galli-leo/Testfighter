@@ -33,6 +33,23 @@ void MainWindow::dropEvent(QDropEvent *e)
     if (!uw) {
         uw = new UploadWindow(this);
         uw->show();
+        for (int i = 0; i < this->ui->horizontalLayout->count();i++) {
+            if (QWidgetItem *myItem = dynamic_cast <QWidgetItem*>(this->ui->horizontalLayout->itemAt(i))) {
+                QRadioButton *btn = (QRadioButton*)myItem->widget();
+                qDebug() << btn->text();
+                if(btn->isChecked()){
+                    if(btn->text() == "Mac"){
+                        uw->os = "osx";
+                    }else if(btn->text() == "Windows"){
+                        uw->os = "win";
+                    }else if(btn->text() == "Linux"){
+                        uw->os = "linux";
+                    }
+
+
+                }
+            }
+        }
         uw->dir = file;
         hide();
         uw->startUpload();

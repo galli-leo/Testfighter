@@ -23,6 +23,7 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include "uploadmanager.h"
+#include "appdata.h"
 
 namespace Ui {
 class UploadWindow;
@@ -36,6 +37,7 @@ public:
     explicit UploadWindow(QWidget *parent = 0);
     ~UploadWindow();
     QString dir;
+    QString os;
     void startUpload();
 private slots:
     void uploadFin();

@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QTimer>
 //#include <QMessageBox>
 #include "filedownloader.h"
 #include "mainwindow.h"
@@ -24,6 +25,7 @@ signals:
 public slots:
 
 private slots:
+    void update();
     void downloadProg(qint64 bytesReceived, qint64 bytesTotal);
     void headersFinished(QNetworkReply* reply);
     void downloadFinished();
@@ -37,6 +39,8 @@ private:
     int currentHeaderIndex;
     const char* fromQString(QString string);
     qint64 lastDlSize;
+    double lastTimeNice;
+    qint64 lastDlNice;
     QString readableTime(int secconds);
     QString plural(int times, QString base);
     int times;

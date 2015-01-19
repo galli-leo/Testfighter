@@ -42,6 +42,7 @@ private slots:
     void selectedChange(QString item);
     void hashDownloaded();
     void downloadManagerFinished();
+    void launchFinished(int exitCode, QProcess::ExitStatus exitStatus);
     QString hash(QString file);
 private:
     Ui::MainWindow *ui;
@@ -55,6 +56,7 @@ private:
     QByteArray dlListData;
     void install(bool updating, QString item);
     void afterInstall(QString item);
+    launch();
     QString appDir;
 };
 

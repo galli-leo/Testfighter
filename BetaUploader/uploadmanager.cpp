@@ -197,10 +197,7 @@ void UploadManager::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
     }
     }
     qDebug() << "Hello there";
-    QFile file(this->itemsToUpload.at(this->currentUploadIndex));
 
-    file.open(QIODevice::ReadOnly);
-    qDebug() << this->currentFile->pos();
     lastTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
 
 }

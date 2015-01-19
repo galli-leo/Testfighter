@@ -7,7 +7,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
-    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/options.json" ) ) );
+    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "options.json" ) ) );
 
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
@@ -19,7 +19,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
     // Lets print the HTTP GET response.
     //qDebug( reply->readAll());
 
-    QNetworkReply *replyList = networkMgr->get( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/list.json" ) ) );
+    QNetworkReply *replyList = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "list.json" ) ) );
 
     QEventLoop loopList;
     QObject::connect(replyList, SIGNAL(finished()), &loopList, SLOT(quit()));
@@ -82,6 +82,7 @@ void UploadWindow::setupFields()
     optionsSorted.insert("text", emptyList);
     optionsSorted.insert("textfield", emptyList);
     optionsSorted.insert("yes/no", emptyList);
+    qDebug() << this->options;
     foreach(QString key, this->options.keys())
     {
         QJsonObject option = this->options.value(key).toObject();
@@ -162,7 +163,7 @@ void UploadWindow::initUpload()
 #else
     QDirIterator it(this->dir, QDir::Files, QDirIterator::Subdirectories);
 #endif
-    QNetworkReply *replyHash = networkMgr->get( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/builds/hash"+ dirName + ".json" ) ) );
+    QNetworkReply *replyHash = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "builds/hash"+ dirName + ".json" ) ) );
 
     QEventLoop loopHash;
     QObject::connect(replyHash, SIGNAL(finished()), &loopHash, SLOT(quit()));
@@ -182,15 +183,15 @@ void UploadWindow::initUpload()
         QString folderName = info.absolutePath();
         QString fileT = folderName.replace(dirName, "|||");
         QString path = dirName + fileT.split("|||").last() + "/";
-        qDebug() << fileL;
-        //qDebug() << hash(fileL);
-        qDebug() << path+info.fileName();
-        //qDebug() << hashes.keys().at(0);
-        qDebug() << hashes[path+info.fileName()].toString();
+        qDebug() << "local file: " << fileL;
+        qDebug() <<  "hash of local file: " << hash(fileL);
+        qDebug() << "path + filename" << path+info.fileName();
+        //qDebug() << "hashs" <<hashes.keys().at(0);
+        qDebug() << "hashes at filename"<<hashes[path+info.fileName()].toString();
         if(hash(fileL) != hashes[path+info.fileName()].toString()){
             qDebug() << "ASDFASDFASDF";
-        uploadManager->addItem(fileL);
-        uploadManager->addPath(path);
+            uploadManager->addItem(fileL);
+            uploadManager->addPath(path);
         }
     }
     uploadManager->start();
@@ -209,7 +210,7 @@ void UploadWindow::uploadProgress(QString ulSpeed, QString timeRemaining, float 
 }
 void UploadWindow::buildSubmit()
 {
-    QUrl url("http://leonardogalli.ch/beta/build_submit.php");
+    QUrl url(AppData::Instance()->settings["url"].toString() + "build_submit.php");
     QNetworkRequest request(url);
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);

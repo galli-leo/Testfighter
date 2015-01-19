@@ -19,6 +19,7 @@ public:
     QString appExtension;
     QJsonObject settings;
     QString appDirectory;
+    QString osName;
 
 signals:
 

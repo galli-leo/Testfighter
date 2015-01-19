@@ -7,12 +7,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
     appDir = AppData::Instance()->appDirectory;
-    QUrl imageUrl(AppData::Instance()->settings["url"].toString() + "list.json");
+    QUrl imageUrl(AppData::Instance()->settings["url"].toString() + AppData::Instance()->osName+"_list.json");
     fileDownloader = new FileDownloader(imageUrl, this);
 
     connect(fileDownloader, SIGNAL(downloaded()), SLOT(fileDownloaded()));
     ui->setupUi(this);
     ui->comboBox->addItem("Loading Items");
+    ui->pushButton->setEnabled(false);
     ui->listWidget->addItem("15 of December 2014:\nRelease of Beta Launcher");
     ui->progressBar->setHidden(true);
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
@@ -83,6 +84,7 @@ void MainWindow::fileDownloaded()
     loadFile.close();
     this->list = root;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
+    ui->pushButton->setEnabled(false);
     if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
@@ -100,48 +102,14 @@ void MainWindow::handleButton()
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
     if(this->isInstalled(ui->comboBox->currentText())&&!this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
-        //Find exe and launch, also ensure that steam is running or else launch it
-        const QStringList nameFilter( ui->comboBox->currentText()+AppData::Instance()->appExtension);
-        QDir dir(AppData::Instance()->appPath( ui->comboBox->currentText()));
-        qDebug() << AppData::Instance()->appDirectory + ui->comboBox->currentText() << " " << ui->comboBox->currentText();
-        QDirIterator dirIt( AppData::Instance()->appDirectory + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
-        while (dirIt.hasNext()) {
-            dirIt.next();
-
-                    qDebug()<<dirIt.filePath();
-                    QProcess *myProcess = new QProcess(this);
-                    QStringList arguments;
-                    myProcess->start(dirIt.fileInfo().absoluteFilePath(), arguments);
-
-                    ui->centralWidget->hide();
-                    myProcess->waitForFinished(-1);
-                    ui->centralWidget->show();
-                    qDebug() <<  myProcess->errorString();
-                    myProcess->dumpObjectInfo();
-        }
+        launch();
     }else{
+
         if(this->needsUpdateList.contains(ui->comboBox->currentText()))
         {
             if (QMessageBox::No == QMessageBox(QMessageBox::Information, "Update available", "Do you want to update " + ui->comboBox->currentText() + "?", QMessageBox::Yes|QMessageBox::No).exec())
             {
-                //Find exe and launch, also ensure that steam is running or else launch it
-                const QStringList nameFilter(AppData::Instance()->appPath( ui->comboBox->currentText()));
-                QDir dir(appDir + ui->comboBox->currentText());
-                QDirIterator dirIt(appDir + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
-                while (dirIt.hasNext()) {
-                    dirIt.next();
-
-                            qDebug()<<dirIt.filePath();
-                            QProcess *myProcess = new QProcess(this);
-                            QStringList arguments;
-                            myProcess->start(dirIt.fileInfo().absoluteFilePath(), arguments);
-
-                            ui->centralWidget->hide();
-                            myProcess->waitForFinished(-1);
-                            ui->centralWidget->show();
-                            qDebug() <<  myProcess->errorString();
-                            myProcess->dumpObjectInfo();
-                }
+                launch();
                 return;
             }
         }
@@ -158,9 +126,10 @@ void MainWindow::install(bool updating, QString item)
 
 
 
-    this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hash" + item + ".json"));
+    this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json"));
     connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
+    ui->comboBox->setEnabled(false);
     ui->label->setText("Inizializing");
     ui->label_3->setText("");
     printf("Installing");
@@ -232,7 +201,7 @@ void MainWindow::hashDownloaded()
     {
         count++;
         qDebug() << "Adding file: %s" << "http://leonardogalli.ch/beta/builds/" << file;
-        manager->addItem(QUrl(AppData::Instance()->settings["url"].toString() + "builds/"+ file));
+        manager->addItem(QUrl(AppData::Instance()->settings["url"].toString() + "builds/"+AppData::Instance()->osName+"/"+ file));
         manager->addPath(rootPath + "/" + file);
 
     }
@@ -291,13 +260,14 @@ void MainWindow::downloadManagerFinished()
 
 
     ui->pushButton->setEnabled(true);
-
+    ui->comboBox->setEnabled(true);
     this->needsUpdateList.removeAt(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
     this->selectedChange(ui->comboBox->currentText());
 
 }
 bool MainWindow::isInstalled(QString item)
 {
+        qDebug() << (QDir(AppData::Instance()->appDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0? "Installed: true" : "Installed: false");
         return QDir(AppData::Instance()->appDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
 }
 
@@ -321,4 +291,49 @@ void MainWindow::afterInstall(QString item)
 
         }
     }
+}
+
+void MainWindow::launch()
+{
+    //Find exe and launch, also ensure that steam is running or else launch it
+
+    //gives the filter (e.g. yourapp.exe)
+    const QStringList nameFilter( ui->comboBox->currentText()+AppData::Instance()->appExtension);
+    qDebug() << AppData::Instance()->appDirectory + ui->comboBox->currentText() << " " << ui->comboBox->currentText();
+    //The iterator searching for the file
+    QDirIterator dirIt(AppData::Instance()->appDirectory + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
+    while (dirIt.hasNext()) {
+        dirIt.next();
+
+                qDebug()<<dirIt.filePath();
+                //Real path for mac apps, windows it is just the exe file, mac it is yourapp.app/Contents/MacOs/yourapp
+                QString realPath = dirIt.filePath();
+                if(dirIt.filePath().contains(".app")){
+                    realPath += "/Contents/MacOS/" + ui->comboBox->currentText();
+                    QFile file(realPath);
+                    //Set the permissions so we are sure we can launch it, dl it usually results in no permissions
+                    file.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ReadOwner | QFile::ReadOther | QFile::ReadUser);
+                }
+
+                QProcess *myProcess = new QProcess(this);
+                QStringList arguments;
+                myProcess->start(realPath, arguments);
+                qDebug() << realPath;
+                //ui->centralWidget->hide();
+                //Show it minimized, so it does not confront app
+                ui->centralWidget->showMinimized();
+                this->showMinimized();
+                this->clearFocus();
+                connect(myProcess, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
+
+
+
+                qDebug() <<  myProcess->errorString();
+                myProcess->dumpObjectInfo();
+    }
+}
+void MainWindow::launchFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    qDebug() << "Launch finished with exit code: " << exitCode << exitStatus;
+    this->showNormal();
 }
