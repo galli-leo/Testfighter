@@ -279,7 +279,9 @@ MainWindow::~MainWindow()
 void MainWindow::afterInstall(QString item)
 {
     //Fetch dependency and install
+    //TODO: MAKE THIS WORK
     QString depend = this->list[item].toObject()["prereq"].toString();
+    qDebug() << depend;
     QDirIterator it("", QDir::NoFilter, QDirIterator::Subdirectories);
 
     while(it.hasNext())
