@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->comboBox->addItem("Loading Items");
     ui->pushButton->setEnabled(false);
-    ui->listWidget->addItem("15 of December 2014:\nRelease of Beta Launcher");
+    feedDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "feed/index.php?num=200"), this);
+    connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded());
     ui->progressBar->setHidden(true);
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedChange(QString)));
@@ -97,6 +98,18 @@ void MainWindow::fileDownloaded()
         ui->label_3->setText("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
     }
 }
+void MainWindow::feedDownloaded()
+{
+    QByteArray m_DownloadedData = feedDownloader->downloadedData();
+    qDebug() << "data: \n" << feedDownloader->downloadedData().data();
+    QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
+    foreach(QJsonValue item, loadDoc.object().value())
+    {
+        QDate converted_date(QDate::fromString(item.toObject()["date"], "dd-MM-yyyy "));
+        QString title =
+    }
+}
+
 void MainWindow::handleButton()
 {
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();

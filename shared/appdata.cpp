@@ -25,13 +25,13 @@ AppData::AppData(QObject *parent) : QObject(parent)
     appDirectory = QStandardPaths::writableLocation( QStandardPaths::GenericDataLocation )+ "/Testfighter/Apps/";
 
 
-#elif Q_OS_WIN32
+#elif defined(Q_OS_WIN32)
     appExtension = ".exe";
     osName = "win";
     appDirectory = QCoreApplication::applicationFilePath() + "Apps/";
 
 
-#elif Q_OS_LINUX
+#elif defined(Q_OS_LINUX)
     osName = "linux";
     appDirectory = QCoreApplication::applicationFilePath() + "Apps/";
 #endif
@@ -53,7 +53,7 @@ QString AppData::appPath(QString path)
 #ifdef Q_OS_MAC
     apppath = path+".app/Contents/MacOS/" + appName;
 
-#elif Q_OS_WIN32
+#elif defined(Q_OS_WIN32)
     apppath = path+".exe";
 #endif
     return apppath;

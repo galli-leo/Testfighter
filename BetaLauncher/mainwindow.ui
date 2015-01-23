@@ -27,7 +27,7 @@
      <string>Select Game to play</string>
     </property>
     <property name="styleSheet">
-     <string notr="true">/*border-image: url(:/images/dropdown.png);
+     <string notr="true">/*
 down-arrow {image: url(noimg); border-width: 0px; width: 0px;}*/</string>
     </property>
     <property name="currentText">
@@ -120,6 +120,14 @@ color: rgb(255, 255, 255);*/
       <height>192</height>
      </rect>
     </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Loading Items</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">

@@ -44,10 +44,12 @@ private slots:
     void downloadManagerFinished();
     void launchFinished(int exitCode, QProcess::ExitStatus exitStatus);
     QString hash(QString file);
+    void feedDownloaded();
 private:
     Ui::MainWindow *ui;
     FileDownloader* fileDownloader;
     FileDownloader* hashDownloader;
+    FileDownloader* feedDownloader;
     QNetworkAccessManager m_WebCtrl;
     QJsonObject list;
     bool isInstalled(QString item);
@@ -56,7 +58,7 @@ private:
     QByteArray dlListData;
     void install(bool updating, QString item);
     void afterInstall(QString item);
-    launch();
+    void launch();
     QString appDir;
 };
 

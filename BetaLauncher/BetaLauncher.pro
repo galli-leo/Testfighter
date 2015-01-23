@@ -27,8 +27,6 @@ FORMS    += mainwindow.ui
 
 OTHER_FILES += \
     button.css \
-    blue_button02.png \
-    blue_button03.png
 
 RESOURCES += \
     Resources.qrc
