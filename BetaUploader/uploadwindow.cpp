@@ -193,7 +193,34 @@ void UploadWindow::initUpload()
             uploadManager->addItem(fileL);
             uploadManager->addPath(path);
         }
+        hashes.remove(path+info.fileName());
     }
+    QString filesToRemove = "";
+    foreach(QString key, hashes.keys())
+    {
+
+        filesToRemove + key + ";";
+
+    }
+    qDebug() << filesToRemove;
+    if(filesToRemove != "")
+    {
+        QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+        QHttpPart loginPart;
+        /* password */
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
+        loginPart.setBody("testfighter2015");
+        multiPart->append(loginPart);
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"files\""));
+        loginPart.setBody(filesToRemove.toLocal8Bit());
+        QNetworkReply *replyDel = networkMgr->post( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/builds/remove_files.php" ) ), multiPart );
+        multiPart->setParent(replyDel);
+        QEventLoop loopDel;
+        QObject::connect(replyDel, SIGNAL(finished()), &loopDel, SLOT(quit()));
+        loopDel.exec();
+        qDebug() << replyDel->readAll();
+    }
+
     uploadManager->start();
 }
 void UploadWindow::uploadFin()
