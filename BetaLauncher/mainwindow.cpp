@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->addItem("Loading Items");
     ui->pushButton->setEnabled(false);
     feedDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "feed/index.php?num=200"), this);
-    connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded());
+    connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded()));
     ui->progressBar->setHidden(true);
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedChange(QString)));
@@ -100,13 +100,17 @@ void MainWindow::fileDownloaded()
 }
 void MainWindow::feedDownloaded()
 {
+    ui->listWidget->clear();
     QByteArray m_DownloadedData = feedDownloader->downloadedData();
     qDebug() << "data: \n" << feedDownloader->downloadedData().data();
     QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
-    foreach(QJsonValue item, loadDoc.object().value())
+    foreach(QJsonValue item, loadDoc.array())
     {
-        QDate converted_date(QDate::fromString(item.toObject()["date"], "dd-MM-yyyy "));
-        QString title =
+        QDateTime converted_date(QDateTime::fromString(item.toObject()["date"].toString(), "dd-MM-yyyy hh:mm:ss"));
+        qDebug() << converted_date;
+        QString title = converted_date.toString("dd.MM.yy") + ": " + item.toObject()["title"].toString() + "\n\n";
+        QString whole = title + item.toObject()["text"].toString() + "\n\n";
+        ui->listWidget->addItem(whole);
     }
 }
 
