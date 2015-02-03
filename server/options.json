@@ -1,0 +1,33 @@
+{
+	"bUsesSteam" : {
+		"Name" : "Uses Steam?",
+		"Type" : "yes/no",
+		"When" : "init"
+	},
+	"changelog" : {
+		"Name" : "Changelog",
+		"Type" : "text",
+		"When" : "update"
+	},
+	"prereq" : {
+		"Name" : "Prerequesites exe file name",
+		"Type" : "textfield",
+		"When" : "init"
+	},
+	"description" : {
+		"Name" : "Description",
+		"Type" : "text",
+		"When" : "init"
+	},
+	"version" : {
+		"Name" : "Version",
+		"Type" : "textfield",
+		"When" : "update"
+	},
+	"build" : {
+		"Name" : "Build",
+		"Type" : "textfield",
+		"When" : "update"
+	}
+	
+}
