@@ -1,4 +1,4 @@
-BetaLauncher
+Testfighter
 ============
 
 [![Build Status](https://travis-ci.org/DJLectr0/Testfighter.svg)](https://travis-ci.org/DJLectr0/BetaLauncher)
