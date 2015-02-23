@@ -6,6 +6,7 @@ install:
 
 
 script:
+  - cd BetaLauncher
   - qmake -project "QT += core gui network"
-  - qmake "QT += widgets core gui network" BetaLauncher/BetaLauncher.pro
+  - qmake "QT += widgets core gui network" BetaLauncher.pro
   - make
