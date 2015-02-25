@@ -5,6 +5,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::UploadWindow)
 {
+    cli = false;
     ui->setupUi(this);
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
     QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "options.json" ) ) );
@@ -224,6 +225,10 @@ void UploadWindow::uploadFin()
     this->ui->progressBar->setValue(100);
     this->ui->label->setText("");
     this->ui->pushButton->setEnabled(true);
+    if(cli)
+    {
+        this->buildSubmit();
+    }
 }
 void UploadWindow::uploadProgress(QString ulSpeed, QString timeRemaining, float percentage)
 {
@@ -346,4 +351,34 @@ QString UploadWindow::hash(QString file)
 
     }
     return hash.result().toHex();
+}
+
+void UploadWindow::setField(QString key, QString value)
+{
+    QWidget* edit = edits[key];
+
+
+    if(!strcmp( edit->metaObject()->className(), "QTextEdit"))
+    {
+
+        QTextEdit* textEdit = (QTextEdit*)edit;
+        textEdit->setText(value);
+    }
+    if(!strcmp( edit->metaObject()->className(), "QLineEdit"))
+    {
+
+        QLineEdit* textEdit = (QLineEdit*)edit;
+        textEdit->setText(value);
+    }
+    if(!strcmp( edit->metaObject()->className(), "QCheckBox"))
+    {
+
+        QCheckBox* textEdit = (QCheckBox*)edit;
+        int check = textEdit->checkState();
+        textEdit->setChecked(false);
+        if (value == "true")
+        {
+             textEdit->setChecked(true);
+        }
+    }
 }
