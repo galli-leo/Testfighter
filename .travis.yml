@@ -10,4 +10,11 @@ script:
 #  - qmake -project "QT += core gui network"
   - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaLauncher.pro
   - make
+  - cd ../
+  - cd BetaUploader
+  - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaLauncher.pro
+  - make
   - ls
+  - cd ../
+  - cd server
+  - php *.php
