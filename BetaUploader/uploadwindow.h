@@ -22,6 +22,8 @@
 #include <QMimeDatabase>
 #include <QHttpMultiPart>
 #include <QHttpPart>
+#include <QDebug>
+#include <QCryptographicHash>
 #include "uploadmanager.h"
 #include "appdata.h"
 
