@@ -13,7 +13,7 @@ script:
   - make
   - cd ../
   - cd BetaUploader
-  - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaLauncher.pro
+  - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaUploader.pro
   - make
   - ls
   - cd ../
