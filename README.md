@@ -29,6 +29,7 @@ Features
 Installation
 ------------
 #####Server
+1. Go to the server folder in a terminal and then do `sh remove_placeholders.sh` (Mac only, may work on linux)
 1. Upload the server folder to a VPS or a Webserver which has PHP installed and name it whatever you like.
 2. Open the upload_single.php
 3. Edit the line: `if($_POST["password"]=="testfighter2015")` and change 'testfighter2015' to a password of your choice
