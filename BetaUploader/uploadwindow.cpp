@@ -20,19 +20,9 @@ UploadWindow::UploadWindow(QWidget *parent) :
     // Lets print the HTTP GET response.
     //qDebug( reply->readAll());
 
-
-<<<<<<< HEAD
-    
-
-    
     QByteArray optionsData = reply->readAll();
     QJsonDocument loadDoc = QJsonDocument::fromJson(optionsData);
     qDebug() << optionsData;
-    this->list = loadDocList.object();
-=======
-    
-
->>>>>>> origin/master
     this->options = loadDoc.object();
     //setupFields();
 
