@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     QStringList cmdline_args = QCoreApplication::arguments();
     int i = 0;
     UpdatingWindow w;
+    //CMD options: [fileToDownload] [pathToDowload]
     w.fileToDownload = "BetaLauncher.zip";
     w.pathToDownload = "/Users/leonardogalli/beta/";
     foreach(QString str, cmdline_args)
