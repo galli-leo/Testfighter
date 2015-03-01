@@ -22,8 +22,11 @@
 #include <QMimeDatabase>
 #include <QHttpMultiPart>
 #include <QHttpPart>
+#include <QDebug>
+#include <QCryptographicHash>
 #include "uploadmanager.h"
 #include "appdata.h"
+
 
 namespace Ui {
 class UploadWindow;
@@ -39,6 +42,8 @@ public:
     QString dir;
     QString os;
     void startUpload();
+    bool cli;
+    void setField(QString key, QString value);
 private slots:
     void uploadFin();
     void uploadProgress(QString ulSpeed, QString timeRemaining, float percentage);

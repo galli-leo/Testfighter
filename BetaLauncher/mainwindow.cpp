@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(fileDownloader, SIGNAL(downloaded()), SLOT(fileDownloaded()));
     ui->setupUi(this);
     ui->comboBox->addItem("Loading Items");
-    ui->pushButton->setEnabled(false);
+    //ui->pushButton->setEnabled(false);
     feedDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "feed/index.php?num=200"), this);
     connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded()));
     ui->progressBar->setHidden(true);
@@ -85,7 +85,7 @@ void MainWindow::fileDownloaded()
     loadFile.close();
     this->list = root;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-    ui->pushButton->setEnabled(false);
+
     if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
@@ -97,6 +97,10 @@ void MainWindow::fileDownloaded()
         ui->pushButton->setText("Update");
         ui->label_3->setText("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
     }
+    else
+    {
+        ui->pushButton->setEnabled(false);
+    }
 }
 void MainWindow::feedDownloaded()
 {
@@ -104,6 +108,7 @@ void MainWindow::feedDownloaded()
     QByteArray m_DownloadedData = feedDownloader->downloadedData();
     qDebug() << "data: \n" << feedDownloader->downloadedData().data();
     QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
+    QJsonObject obj = loadDoc.object();
     foreach(QJsonValue item, loadDoc.array())
     {
         QDateTime converted_date(QDateTime::fromString(item.toObject()["date"].toString(), "dd-MM-yyyy hh:mm:ss"));
@@ -122,7 +127,7 @@ void MainWindow::handleButton()
         launch();
     }else{
 
-        if(this->needsUpdateList.contains(ui->comboBox->currentText()))
+        if(this->needsUpdateList.contains(ui->comboBox->currentText()) && !(this->ui->pushButton->text()=="Update"))
         {
             if (QMessageBox::No == QMessageBox(QMessageBox::Information, "Update available", "Do you want to update " + ui->comboBox->currentText() + "?", QMessageBox::Yes|QMessageBox::No).exec())
             {
@@ -139,12 +144,11 @@ void MainWindow::install(bool updating, QString item)
     ui->progressBar->setHidden(false);
     QString rootPath;
     rootPath = appDir;
-    if(!updating)
 
 
 
     this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json"));
-    connect(this->hashDownloader, SIGNAL(downloaded()), SLOT(hashDownloaded()));
+    connect(this->hashDownloader, SIGNAL(downloaded()), this, SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
     ui->comboBox->setEnabled(false);
     ui->label->setText("Inizializing");

@@ -3,6 +3,7 @@
 #include "quazip.h"
 #include "quazipfile.h"
 #include "quazipfileinfo.h"
+#include "appdata.h"
 
 
 UpdatingWindow::UpdatingWindow(QWidget *parent) :
@@ -37,7 +38,7 @@ void UpdatingWindow::startDownload()
                 SLOT(fileDownloaded(QNetworkReply*)));
     writeToFile = new QFile(pathToDownload + fileToDownload);
     writeToFile->open(QIODevice::ReadWrite);
-    QNetworkRequest request("http://leonardogalli.ch/beta/download_update.php?file=" + fileToDownload + "&os="+ osName());
+    QNetworkRequest request(AppData::Instance()->settings["url"].toString() + "download_update.php?file=" + fileToDownload + "&os="+ osName());
    this->reply =  manager.get(request);
     connect(this->reply, SIGNAL(downloadProgress(qint64,qint64)),
                 SLOT(downloadProgress(qint64,qint64)));

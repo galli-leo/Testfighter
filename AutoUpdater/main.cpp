@@ -3,16 +3,12 @@
 #include <QDebug>
 int main(int argc, char *argv[])
 {
-    QByteArray dyldPath = qgetenv("DYLD_LIBRARY_PATH");
-    if(!dyldPath.isEmpty())
-        dyldPath.append(":");
-    dyldPath.append(QCoreApplication::applicationDirPath());
-    qputenv("DYLD_LIBRARY_PATH", dyldPath);
-    qDebug() << dyldPath;
+
     QApplication a(argc, argv);
     QStringList cmdline_args = QCoreApplication::arguments();
     int i = 0;
     UpdatingWindow w;
+    //CMD options: [fileToDownload] [pathToDowload]
     w.fileToDownload = "BetaLauncher.zip";
     w.pathToDownload = "/Users/leonardogalli/beta/";
     foreach(QString str, cmdline_args)

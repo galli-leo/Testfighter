@@ -5,6 +5,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::UploadWindow)
 {
+    cli = false;
     ui->setupUi(this);
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
     QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "options.json" ) ) );
@@ -19,20 +20,19 @@ UploadWindow::UploadWindow(QWidget *parent) :
     // Lets print the HTTP GET response.
     //qDebug( reply->readAll());
 
-    QNetworkReply *replyList = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "list.json" ) ) );
 
-    QEventLoop loopList;
-    QObject::connect(replyList, SIGNAL(finished()), &loopList, SLOT(quit()));
+<<<<<<< HEAD
+    
 
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loopList.exec();
-
-    QJsonDocument loadDocList = QJsonDocument::fromJson(replyList->readAll());
+    
     QByteArray optionsData = reply->readAll();
     QJsonDocument loadDoc = QJsonDocument::fromJson(optionsData);
     qDebug() << optionsData;
     this->list = loadDocList.object();
+=======
+    
+
+>>>>>>> origin/master
     this->options = loadDoc.object();
     //setupFields();
 
@@ -44,6 +44,19 @@ UploadWindow::~UploadWindow()
 }
 void UploadWindow::startUpload()
 {
+    //Get the list for the os we are uploading
+    QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
+    QNetworkReply *replyList = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + this->os+"_list.json" ) ) );
+    qDebug() << os << AppData::Instance()->settings["url"].toString() + this->os+"_list.json";
+    QEventLoop loopList;
+    QObject::connect(replyList, SIGNAL(finished()), &loopList, SLOT(quit()));
+
+    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
+    // which in turn will trigger event loop quit.
+    loopList.exec();
+
+    QJsonDocument loadDocList = QJsonDocument::fromJson(replyList->readAll());
+    this->list = loadDocList.object();
 
     setupFields();
     initUpload();
@@ -63,11 +76,7 @@ void UploadWindow::setupFields()
         dirName = dir.split("/").at(dir.split("/").count()-2);
 
     }
-#ifdef Q_OS_MAC
-    //For the time beeing yosemite does not work so we just use a set path name
-    dirName = "test";
 
-#endif
     qDebug() << this->list;
     qDebug() << dir;
     qDebug() << dirName;
@@ -158,13 +167,9 @@ void UploadWindow::initUpload()
         dirName = dir.split("/").at(dir.split("/").count()-2);
 
     }
-#ifdef Q_OS_MAC
-    //For the time beeing yosemite does not work so we just use a set path name
-    dirName = "test";
-    QDirIterator it("/Users/leonardogalli/BetaLauncher/BetaUploader/test", QDir::Files, QDirIterator::Subdirectories);
-#else
+
     QDirIterator it(this->dir, QDir::Files, QDirIterator::Subdirectories);
-#endif
+
     QNetworkReply *replyHash = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "builds/hash"+ dirName + ".json" ) ) );
 
     QEventLoop loopHash;
@@ -230,6 +235,10 @@ void UploadWindow::uploadFin()
     this->ui->progressBar->setValue(100);
     this->ui->label->setText("");
     this->ui->pushButton->setEnabled(true);
+    if(cli)
+    {
+        this->buildSubmit();
+    }
 }
 void UploadWindow::uploadProgress(QString ulSpeed, QString timeRemaining, float percentage)
 {
@@ -286,12 +295,15 @@ void UploadWindow::buildSubmit()
          dirName = dir.split("/").at(dir.split("/").count()-2);
 
      }
-#ifdef Q_OS_MAC
-     dirName = "test";
-#endif
+
      qDebug() << dirName.toLocal8Bit();
      fileName.setBody(dirName.toLocal8Bit());
      multiPart->append(fileName);
+     QHttpPart osName;
+     osName.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
+     osName.setBody(this->os.toLocal8Bit());
+     multiPart->append(osName);
+
     qDebug() << multiPart;
     QNetworkAccessManager* networkManager = new QNetworkAccessManager(this);
     QNetworkReply* reply = networkManager->post(request, multiPart);
@@ -349,4 +361,34 @@ QString UploadWindow::hash(QString file)
 
     }
     return hash.result().toHex();
+}
+
+void UploadWindow::setField(QString key, QString value)
+{
+    QWidget* edit = edits[key];
+
+
+    if(!strcmp( edit->metaObject()->className(), "QTextEdit"))
+    {
+
+        QTextEdit* textEdit = (QTextEdit*)edit;
+        textEdit->setText(value);
+    }
+    if(!strcmp( edit->metaObject()->className(), "QLineEdit"))
+    {
+
+        QLineEdit* textEdit = (QLineEdit*)edit;
+        textEdit->setText(value);
+    }
+    if(!strcmp( edit->metaObject()->className(), "QCheckBox"))
+    {
+
+        QCheckBox* textEdit = (QCheckBox*)edit;
+        int check = textEdit->checkState();
+        textEdit->setChecked(false);
+        if (value == "true")
+        {
+             textEdit->setChecked(true);
+        }
+    }
 }
