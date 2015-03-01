@@ -9,6 +9,8 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QCoreApplication>
+#include <QDebug>
+
 
 class AppData : public QObject
 {

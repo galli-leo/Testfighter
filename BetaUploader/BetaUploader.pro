@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = BetaUploader
 TEMPLATE = app
-INCLUDEPATH += ../shared/
+INCLUDEPATH += $$PWD/../shared/
 
 SOURCES += main.cpp\
         mainwindow.cpp \

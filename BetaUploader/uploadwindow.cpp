@@ -8,7 +8,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
     ui->setupUi(this);
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
     QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "options.json" ) ) );
-
+    qDebug() << AppData::Instance()->settings["url"].toString();
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 
@@ -29,7 +29,9 @@ UploadWindow::UploadWindow(QWidget *parent) :
     loopList.exec();
 
     QJsonDocument loadDocList = QJsonDocument::fromJson(replyList->readAll());
-    QJsonDocument loadDoc = QJsonDocument::fromJson(reply->readAll());
+    QByteArray optionsData = reply->readAll();
+    QJsonDocument loadDoc = QJsonDocument::fromJson(optionsData);
+    qDebug() << optionsData;
     this->list = loadDocList.object();
     this->options = loadDoc.object();
     //setupFields();
