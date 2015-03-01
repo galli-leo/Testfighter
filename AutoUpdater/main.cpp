@@ -3,12 +3,7 @@
 #include <QDebug>
 int main(int argc, char *argv[])
 {
-    QByteArray dyldPath = qgetenv("DYLD_LIBRARY_PATH");
-    if(!dyldPath.isEmpty())
-        dyldPath.append(":");
-    dyldPath.append(QCoreApplication::applicationDirPath());
-    qputenv("DYLD_LIBRARY_PATH", dyldPath);
-    qDebug() << dyldPath;
+
     QApplication a(argc, argv);
     QStringList cmdline_args = QCoreApplication::arguments();
     int i = 0;

@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = AutoUpdater
 TEMPLATE = app
 
-
+INCLUDEPATH += $$PWD/../shared/
 SOURCES += main.cpp\
         updatingwindow.cpp \
     ../shared/appdata.cpp
