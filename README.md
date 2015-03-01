@@ -20,7 +20,9 @@ Features
 
 #####What is planned:
 
-- Github script for UE4 games
+- Fix AutoUpdater and Integrate with Github releases (Necessary for first release)
+- BetaUploader Delete unecessary files (Necessary for first release)
+- Github script for UE4 games (Necessary for first release)
 - New UI for both client and server
 - Login or beta key requirement
 - Stats
