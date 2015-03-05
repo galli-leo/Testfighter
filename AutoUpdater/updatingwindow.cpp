@@ -1,8 +1,5 @@
 #include "updatingwindow.h"
 #include "ui_updatingwindow.h"
-#include "quazip.h"
-#include "quazipfile.h"
-#include "quazipfileinfo.h"
 #include "appdata.h"
 
 
@@ -53,40 +50,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     pReply->deleteLater();
     this->ui->label->setText("Unpacking");
 
-    QuaZip zip(writeToFile);
-    zip.open(QuaZip::mdUnzip);
 
-    QuaZipFile file(&zip);
-
-    for(bool f=zip.goToFirstFile(); f; f=zip.goToNextFile()) {
-        //QFileInfo info(file.);
-        //QDir::mkpath(info.absoluteDir());
-        file.open(QIODevice::ReadOnly);
-        //same functionality as QIODevice::readData() -- data is a char*, maxSize is qint64
-        QByteArray dat = file.readAll();
-        //QuaZipFileInfo info;
-        //file.getFileInfo(&info);
-
-        //QDir::mkpath();
-        QFile localFile(pathToDownload + file.getActualFileName());
-
-
-        qDebug() << pathToDownload + file.getActualFileName();
-
-        if(dat.length()==0)
-        {
-            QDir dir;
-            dir.mkpath(pathToDownload + file.getActualFileName());
-        }
-        //qDebug() << info;
-        localFile.open(QIODevice::ReadWrite);
-        localFile.write(dat);
-        //do something with the data
-        file.close();
-    }
-
-    zip.close();
-    //writeToFile->close();
     this->ui->label->setText("Done!");
     this->ui->progressBar->setValue(120);
     QString execPath;

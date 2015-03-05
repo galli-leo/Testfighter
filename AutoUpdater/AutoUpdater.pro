@@ -6,12 +6,14 @@
 
 QT       += network core gui
 
+#DEFINES +=ZLIB_WINAPI=“1”
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AutoUpdater
 TEMPLATE = app
 
 INCLUDEPATH += $$PWD/../shared/
+
 SOURCES += main.cpp\
         updatingwindow.cpp \
     ../shared/appdata.cpp
@@ -22,20 +24,7 @@ HEADERS  += updatingwindow.h \
 
 FORMS    += updatingwindow.ui
 
+DISTFILES += \
+    ../shared/settings.json \
+    ../shared/7za.exe
 
-
-unix|win32: LIBS += -L$$PWD/zlib/lib/ -lz
-
-INCLUDEPATH += $$PWD/zlib/include
-DEPENDPATH += $$PWD/zlib/include
-
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/zlib/lib/z.lib
-else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/zlib/lib/libz.a
-
-unix|win32: LIBS += -L$$PWD/quazip/lib/ -lquazip
-
-INCLUDEPATH += $$PWD/quazip/include
-DEPENDPATH += $$PWD/quazip/include
-
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/quazip/lib/quazip.lib
-else:unix|win32-g++: PRE_TARGETDEPS += $$PWD/quazip/lib/libquazip.a
