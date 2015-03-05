@@ -51,6 +51,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     this->ui->label->setText("Unpacking");
 
 
+
     this->ui->label->setText("Done!");
     this->ui->progressBar->setValue(120);
     QString execPath;
@@ -59,6 +60,8 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
         QProcess::execute(QString("chmod +x %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ + ".app/Contents/MacOS/" + fileToDownload.replace(".zip", "")));
         QProcess::execute(QString("chmod +x %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app"));
         execPath = QString("open %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app");//"open " + pathToDownload + fileToDownload.replace(".zip", "")+ ".app";// + ".app/Contents/MacOS/" + fileToDownload.replace(".zip", "");
+    }else{
+
     }
     QProcess::startDetached(execPath);
     qDebug() << pathToDownload + fileToDownload.replace(".zip", "") + ".app/Contents/MacOS/" + fileToDownload.replace(".zip", "");

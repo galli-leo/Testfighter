@@ -16,7 +16,7 @@ AppData::AppData(QObject *parent) : QObject(parent)
     //Load options.json
     QFile file("settings.json");
     file.open(QIODevice::ReadWrite);
-    qDebug() << file.readAll();
+    //qDebug() << file.readAll();
     QJsonDocument loadDoc = QJsonDocument::fromJson(file.readAll());
     settings = loadDoc.object();
 

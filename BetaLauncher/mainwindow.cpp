@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->addItem("Loading Items");
     //ui->pushButton->setEnabled(false);
     feedDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "feed/index.php?num=200"), this);
+    qDebug() << AppData::Instance()->settings["url"].toString();
     connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded()));
     ui->progressBar->setHidden(true);
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));

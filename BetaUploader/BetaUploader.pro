@@ -25,3 +25,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     uploadwindow.ui
+
+DISTFILES += \
+    ../shared/settings.json
