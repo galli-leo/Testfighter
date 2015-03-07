@@ -5,6 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    MainWindow w;
     //CMD options: [dir] [os] [metadata e.g: dexcription=This is a test&bUsesSteam=true]
     QStringList args = a.arguments();
     //qDebug() << "args" << args[2];
@@ -41,7 +42,8 @@ int main(int argc, char *argv[])
         uw->show();
         uw->startUpload();
     }else{
-        MainWindow w;
+
+        //w.setParent(a);
         w.show();
     }
 

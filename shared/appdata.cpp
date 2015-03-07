@@ -15,9 +15,13 @@ AppData::AppData(QObject *parent) : QObject(parent)
 {
     //Load options.json
     QFile file("settings.json");
-    file.open(QIODevice::ReadWrite);
+    if(!file.open(QIODevice::ReadWrite)){
+        qDebug() << "Failed to read settings.json!";
+    }
     //qDebug() << file.readAll();
-    QJsonDocument loadDoc = QJsonDocument::fromJson(file.readAll());
+    QByteArray arr = file.readAll();
+    qDebug() << "arr: " << QString(arr);
+    QJsonDocument loadDoc = QJsonDocument::fromJson(arr);
     settings = loadDoc.object();
 
 #ifdef Q_OS_MAC

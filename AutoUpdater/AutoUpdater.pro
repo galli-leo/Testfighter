@@ -28,3 +28,4 @@ DISTFILES += \
     ../shared/settings.json \
     ../shared/7za.exe
 
+
