@@ -57,7 +57,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     QStringList path = pathToDownload.split("/");
     path.removeLast();
     QString oldPath = path.join("/")+"_old/";
-    QString resourcesPath = AppData::Instance()->appPath(pathToDownload);
+    QString resourcesPath = AppData::Instance()->appPath(pathToDownload+fileToDownload.replace(".zip", "")) + "/";
     if(osName() == "win")
     {
         resourcesPath = AppData::Instance()->appPath(pathToDownload).replace(".exe", "")+ "/";
@@ -70,7 +70,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     }
     if(!dir.rename(resourcesPath+"list.json", oldPath+"list.json"))
     {
-        qDebug() << "Move failed!";
+        qDebug() << "Move failed!" << resourcesPath+"list.json" << oldPath+"list.json";
     }
 
 
@@ -79,6 +79,8 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     if(osName() == "osx" || osName()=="linux")
     {
         program = "unzip";
+        arguments << "-o" << pathToDownload + fileToDownload << "-d " << pathToDownload;
+        QProcess::execute("unzip -o " + pathToDownload + fileToDownload + " -d " + pathToDownload);
     }
     else if(osName()== "win")
     {
@@ -95,8 +97,9 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     myProcess->setProcessChannelMode(QProcess::MergedChannels);
     myProcess->start(program, arguments);
     myProcess->waitForFinished(-1);
-    qDebug() << myProcess->program() << myProcess->arguments().at(3);
+    //qDebug() << myProcess->program() << myProcess->arguments().at(3);
     qDebug() << myProcess->readAll();
+    /*
     if (QFile::exists(resourcesPath+"settings.json"))
     {
         QFile::remove(resourcesPath+"settings.json");
@@ -104,12 +107,12 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     if (QFile::exists(resourcesPath+"list.json"))
     {
         QFile::remove(resourcesPath+"list.json");
-    }
+    }*/
     QFile file(oldPath+"settings.json");
     file.rename(resourcesPath+"settings.json");
     QFile file2(oldPath+"list.json");
     file2.rename(resourcesPath+"list.json");
-    old.removeRecursively();
+    //old.removeRecursively();
     this->ui->label->setText("Done!");
     this->ui->progressBar->setValue(120);
     QString execPath;
