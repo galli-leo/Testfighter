@@ -57,7 +57,10 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     QStringList path = pathToDownload.split("/");
     path.removeLast();
     QString oldPath = path.join("/")+"_old/";
-    QString resourcesPath = AppData::Instance()->appPath(pathToDownload+fileToDownload.replace(".zip", "")) + "/";
+    QString exeName = fileToDownload.replace(".zip", "");
+    qDebug() << exeName << AppData::Instance()->appPath(pathToDownload+exeName) << AppData::Instance()->appPath(pathToDownload+exeName).replace(exeName, "").replace(".app", exeName+".app");
+
+    QString resourcesPath = AppData::Instance()->appPath(pathToDownload+exeName).replace(exeName, "").replace(".app", exeName+".app");
     if(osName() == "win")
     {
         resourcesPath = AppData::Instance()->appPath(pathToDownload).replace(".exe", "")+ "/";
@@ -99,7 +102,6 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     myProcess->waitForFinished(-1);
     //qDebug() << myProcess->program() << myProcess->arguments().at(3);
     qDebug() << myProcess->readAll();
-    /*
     if (QFile::exists(resourcesPath+"settings.json"))
     {
         QFile::remove(resourcesPath+"settings.json");
@@ -107,12 +109,12 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     if (QFile::exists(resourcesPath+"list.json"))
     {
         QFile::remove(resourcesPath+"list.json");
-    }*/
+    }
     QFile file(oldPath+"settings.json");
     file.rename(resourcesPath+"settings.json");
     QFile file2(oldPath+"list.json");
     file2.rename(resourcesPath+"list.json");
-    //old.removeRecursively();
+    old.removeRecursively();
     this->ui->label->setText("Done!");
     this->ui->progressBar->setValue(120);
     QString execPath;
