@@ -100,7 +100,7 @@ void MainWindow::fileDownloaded()
     }
     else
     {
-        ui->pushButton->setEnabled(false);
+        ui->pushButton->setEnabled(true);
     }
 }
 void MainWindow::feedDownloaded()
@@ -169,18 +169,20 @@ void MainWindow::selectedChange(QString item)
     {
         ui->pushButton->setText("Install");
         ui->label_3->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        ui->pushButton->setEnabled(true);
 
     }
     else if(this->needsUpdateList.contains(item))
     {
         ui->pushButton->setText("Update");
         ui->label_3->setText("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
-
+        ui->pushButton->setEnabled(true);
     }
     else
     {
         ui->pushButton->setText("Launch");
         ui->label_3->setText("");
+        ui->pushButton->setEnabled(true);
     }
 
 }

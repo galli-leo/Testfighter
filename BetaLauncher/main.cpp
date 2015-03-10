@@ -17,9 +17,15 @@ int main(int argc, char *argv[])
 
     // Lets print the HTTP GET response.
     qDebug( reply->readAll());3*/
+    if(AppData::Instance()->checkForUpdate("BetaLauncher"))
+    {
+        return 0;
+    }
 
-    MainWindow w;
-    w.show();
+        MainWindow w;
+        w.show();
+
+    qDebug() << "no update available";
 
     return a.exec();
 }

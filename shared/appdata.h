@@ -10,6 +10,9 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QProcess>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 
 class AppData : public QObject
@@ -22,6 +25,8 @@ public:
     QJsonObject settings;
     QString appDirectory;
     QString osName;
+    bool checkForUpdate(QString appName);
+    QJsonObject setItem(QJsonObject dict, QString key, QJsonValue value);
 
 signals:
 
