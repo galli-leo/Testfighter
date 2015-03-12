@@ -137,7 +137,7 @@ void UploadManager::startUpload(int index)
 {
     lastUlSize = 0;
     QFile *file =  new QFile(this->itemsToUpload.at(index));
-    QUrl url("http://leonardogalli.ch/beta/upload_single.php");
+    QUrl url(AppData::Instance()->settings["url"].toString()+"upload_single.php");
     QNetworkRequest request(url);
     this->currentFile = file;
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
@@ -146,6 +146,11 @@ void UploadManager::startUpload(int index)
     loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
     loginPart.setBody("testfighter2015");
     multiPart->append(loginPart);
+    /* os */
+    loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
+    loginPart.setBody(AppData::Instance()->osName.toLatin1());
+    multiPart->append(loginPart);
+    /* path */
     loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"path\""));
     loginPart.setBody(this->paths.at(index).toLocal8Bit());
     qDebug() << this->paths.at(index).toLocal8Bit();
@@ -212,7 +217,7 @@ void UploadManager::finished()
 {
     this->currentUploadIndex++;
     QByteArray data = currentReply->readAll();
-    qDebug() << data;
+    qDebug() << "DATAAAAAAAAA: " << data;
     QString dataString = QString(data);
     if(!dataString.contains("has been uploaded"))
     {

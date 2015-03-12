@@ -66,8 +66,10 @@ void FileDownloader::readyRead()
     m_DownloadedData += data;
     if (this->shouldSave)
     {
-        //qDebug() << "Got data: " << data;
+        //this->writeToFile->open(QIODevice::ReadWrite);
+        qDebug() << "Got data: " << data;
         this->writeToFile->write(data);
+        qDebug() << "asdf" << this->writeToFile->fileName();
 
     }
 

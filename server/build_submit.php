@@ -1,4 +1,5 @@
 <?php
+
 require_once("feed/classes/class.FeedContent.php");
 $feedC = new FeedContent("feed/items.json");
 $filename= $_POST['filename'];
@@ -19,8 +20,7 @@ for($i = 0; $i < count($dist); $i++)
  file_put_contents (  'test/'.$filename.'/dependencies.txt' ,  $distt);*/
   
 $string = file_get_contents("$os"."_list.json");
-echo $os;
-echo $filename;
+
 $jsonA = json_decode($string, true);
 $stringo = file_get_contents("options.json");
 $jsonIterator = json_decode($stringo, true);
@@ -54,21 +54,23 @@ $jsonA[$filename] = $root;
 $jsonStr = json_encode($jsonA);
 file_put_contents($os.'_list.json', $jsonStr);
 
-/*Create hashes
-
+/*
+* Create hashes
 */
 unlink('test/'.$filename.'.zip');
 rename('test/'.$filename, 'builds/'.$os .'/'.$filename);
 //echo "http://leonardogalli.ch/beta/hashCreate.php?filename=$filename<br>";
-
+echo "teste";
 $array = array();
+echo "teste";
 $iterator = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator("builds/$os/$filename/", 
         RecursiveDirectoryIterator::SKIP_DOTS),
     RecursiveIteratorIterator::SELF_FIRST);
+    echo "teste";
 foreach ($iterator  as $item) {
     // Note SELF_FIRST, so array keys are in place before values are pushed.
-
+		echo "teste";
         $subPath = $iterator->getSubPathName();
             if($item->isDir()) {
                 // Create a new array key of the current directory name.
@@ -78,9 +80,11 @@ foreach ($iterator  as $item) {
                 $array[$subPath][] = $subPath;
             }
 }
+echo "teste";
 $hashes;
+echo "teste";
 foreach ($array as $key=>$val){
-	if(!is_dir("builds/$filename/$key")){
+	if(!is_dir("builds/$os/$filename/$key")){
 		$hash = md5_file("builds/$os/$filename/$key");
 		echo "hash of builds/$filename/$key is $hash";
 		echo "<br>";

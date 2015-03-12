@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QMessageBox>
+#include "appdata.h"
 class UploadManager : public QObject
 {
     Q_OBJECT

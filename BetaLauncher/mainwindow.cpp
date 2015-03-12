@@ -149,6 +149,7 @@ void MainWindow::install(bool updating, QString item)
 
 
     this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json"));
+    qDebug() << AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json";
     connect(this->hashDownloader, SIGNAL(downloaded()), this, SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
     ui->comboBox->setEnabled(false);
