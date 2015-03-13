@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QDebug>
 
 
 class FileDownloader : public QObject
