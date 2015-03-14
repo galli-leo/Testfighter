@@ -61,7 +61,8 @@ void MainWindow::fileDownloaded()
             {
                 //itemJ["bNeedsUpdate"] = "true";
                 this->needsUpdateList.append(item);
-                this->times.append(loadDoc.object()[item].toObject()["time"].toString());
+                qDebug() << "TIME: " <<  loadDoc.object()[item] << loadDoc.object()[item].toObject()["time"].toString();
+                this->times.insert(item, QString::number(loadDoc.object()[item].toObject()["time"].toInt()));
             }
             foreach(QString key, loadDoc.object()[item].toObject().keys())
             {
@@ -289,6 +290,19 @@ void MainWindow::downloadManagerFinished()
     this->needsUpdateList.removeAt(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
     this->selectedChange(ui->comboBox->currentText());
 
+
+    QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
+    item = AppData::Instance()->setItem(item, "time", this->times[ui->comboBox->currentText()].toInt());
+    this->list = AppData::Instance()->setItem(this->list, ui->comboBox->currentText(), item);
+    qDebug() << this->list << this->list[ui->comboBox->currentText()] << this->list[ui->comboBox->currentText()].toObject()["times"] << this->times[ui->comboBox->currentText()];
+    QFile loadFile("list.json");
+
+    loadFile.open(QIODevice::ReadWrite);
+    QJsonDocument writeDoc(this->list);
+    loadFile.resize(0);
+    loadFile.write(writeDoc.toJson());
+    loadFile.close();
+
 }
 bool MainWindow::isInstalled(QString item)
 {
@@ -332,35 +346,48 @@ void MainWindow::launch()
     while (dirIt.hasNext()) {
         dirIt.next();
 
-                qDebug()<<dirIt.filePath();
+                qDebug()<< "Path" << dirIt.filePath();
                 //Real path for mac apps, windows it is just the exe file, mac it is yourapp.app/Contents/MacOs/yourapp
                 QString realPath = dirIt.filePath();
                 if(dirIt.filePath().contains(".app")){
                     realPath += "/Contents/MacOS/" + ui->comboBox->currentText();
+                    //realPath = QString("\"") + realPath+ QString("\"");
                     QFile file(realPath);
-                    //Set the permissions so we are sure we can launch it, dling it usually results in no permissions
+                    //Set the permissions so we are sure we can launch it, dling it usually results in not the right permissions
                     file.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ReadOwner | QFile::ReadOther | QFile::ReadUser);
                 }
 
-                QProcess *myProcess = new QProcess(this);
+                launchProc = new QProcess(this);
                 QStringList arguments;
-                myProcess->start(realPath, arguments);
+                arguments << realPath;
+                launchProc->start(realPath, arguments );
+                //QProcess::startDetached(realPath);
                 qDebug() << realPath;
                 //ui->centralWidget->hide();
                 //Show it minimized, so it does not confront app
                 ui->centralWidget->showMinimized();
                 this->showMinimized();
                 this->clearFocus();
-                connect(myProcess, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
+                connect(launchProc, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
 
 
 
-                qDebug() <<  myProcess->errorString();
-                myProcess->dumpObjectInfo();
+
     }
 }
 void MainWindow::launchFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "Launch finished with exit code: " << exitCode << exitStatus;
+    qDebug() <<  launchProc->errorString();
+    launchProc->dumpObjectInfo();
+    qDebug() << launchProc->readAllStandardOutput();
+    qDebug() << launchProc->readAllStandardError();
+    //dont now which one of these really works but it works
     this->showNormal();
+    this->show();
+    this->activateWindow();
+    this->raise();
+    this->ui->centralWidget->showNormal();
+    this->ui->centralWidget->raise();
+    this->ui->centralWidget->activateWindow();
 }

@@ -54,12 +54,13 @@ private:
     QJsonObject list;
     bool isInstalled(QString item);
     QStringList needsUpdateList;
-    QStringList times;
+    QHash<QString,QString> times;
     QByteArray dlListData;
     void install(bool updating, QString item);
     void afterInstall(QString item);
     void launch();
     QString appDir;
+    QProcess* launchProc;
 };
 
 #endif // MAINWINDOW_H
