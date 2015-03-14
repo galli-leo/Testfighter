@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QCryptographicHash>
 #include <QMessageBox>
+#include <QJsonValueRef>
 #include "downloadmanager.h"
 #include "filedownloader.h"
 #include "appdata.h"
