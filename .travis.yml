@@ -1,9 +1,9 @@
 install:
  #- sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
- - sudo add-apt-repository --yes ppa:beineri/opt-qt541-trusty
+ - sudo add-apt-repository --yes ppa:ci-train-ppa-service/landing-012
  - sudo apt-get update -qq
- - sudo apt-get install qtbase54 qt54declarative qt54webengine
- - sudo apt-get install qt54tools
+ - sudo apt-get install qtbase-opensource-src qtdeclarative-opensource-src qtwebkit-opensource-src
+ - sudo apt-get install qttools-opensource-src
  - sudo apt-get install php5
 
 
