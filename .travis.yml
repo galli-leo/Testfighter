@@ -5,7 +5,7 @@ install:
  #- sudo apt-get install qtbase-opensource-src qtdeclarative-opensource-src qtwebkit-opensource-src
  #- sudo apt-get install qttools-opensource-src
  #- sudo apt-get install php5
-  - sudo apt-get list qtcreator
+  - sudo apt-cache search qtcreator
   - sudo apt-get install qtcreator5
 
 script:
