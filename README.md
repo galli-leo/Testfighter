@@ -15,14 +15,13 @@ Features
 - Also only new / changed files get downloaded
 - Distribute the Launcher to your clients without needing to compile anything
 - Expanding with more options (e.g. Should steam be present for game) is simple 
-- Auto updating to latest versions
-- Display of latest releases in a feed
+- Auto updating to latest versions (still needs more testing)
+- Display of latest releases and updates in a feed
 - CLI Interface for scripting
 
 #####Planned Features:
 
-- BetaUploader Delete unecessary files
-- Github script for UE4 games (Necessary for first release)
+- Github script for UE4 games
 - New UI for both client and server
 - Login or beta key requirement
 - Stats
