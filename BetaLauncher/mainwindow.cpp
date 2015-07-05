@@ -182,11 +182,13 @@ void MainWindow::hashDownloaded()
 {
     QByteArray m_DownloadedData = hashDownloader->downloadedData();
     this->dlListData = hashDownloader->downloadedData();
-    printf("data: %s\n",hashDownloader->downloadedData().data());
+
     QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
     QJsonObject hashes = loadDoc.object();
     QStringList toDownload;
     QString item = ui->comboBox->currentText();
+
+    qDebug() << hashes;
 
     QDirIterator it(appDir+item, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {

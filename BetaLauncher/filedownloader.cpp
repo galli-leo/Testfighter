@@ -68,5 +68,5 @@ void FileDownloader::readyRead()
     {
         this->writeToFile->write(data);
     }
-
+    QString test = "";
 }

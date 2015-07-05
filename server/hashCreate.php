@@ -31,5 +31,5 @@ foreach ($array as $key=>$val){
 }
 
 $hashesJsonString = json_encode($hashes);
-file_put_contents("builds/hash$filename.json", $hashesJsonString);
+file_put_contents("builds/hashes/$filename.json", $hashesJsonString);
 ?>

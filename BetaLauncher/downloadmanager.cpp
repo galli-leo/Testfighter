@@ -133,7 +133,7 @@ QString DownloadManager::readableTime(int secconds)
     numbers.insert("day", days);
     numbers.insert("hour", hours);
     numbers.insert("minute", mins);
-    numbers.insert("seccond", secs);
+    numbers.insert("second", secs);
     foreach(QString key, numbers.keys())
     {
        if(numbers.find(key).value() != 0)
