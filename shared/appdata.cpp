@@ -27,7 +27,7 @@ AppData::AppData(QObject *parent) : QObject(parent)
 #ifdef Q_OS_MAC
     appExtension = ".app";
     osName = "osx";
-    appDirectory = QStandardPaths::writableLocation( QStandardPaths::GenericDataLocation )+ "/Testfighter/Apps/";
+    docsDirectory = QStandardPaths::writableLocation( QStandardPaths::GenericDataLocation )+ "/Testfighter/Apps/";
 
 
 #elif defined(Q_OS_WIN32)
@@ -41,11 +41,12 @@ AppData::AppData(QObject *parent) : QObject(parent)
     appDirectory = QCoreApplication::applicationFilePath() + "Apps/";
 #endif
 
-    QDir dir(appDirectory);
-    dir.mkpath(appDirectory);
+    QDir dir(docsDirectory);
+    dir.mkpath(docsDirectory);
 }
 
-QString AppData::appPath(QString path)
+
+QString AppData::executablePath(QString path)
 {
     QString apppath = "";
     if(path.at(path.length()-1)=='/')
@@ -73,21 +74,11 @@ AppData::~AppData()
 bool AppData::checkForUpdate(QString appName)
 {
     QString localHash = AppData::Instance()->settings["hash"].toString();
+    QString onlineHash = AppData::getStringResponse("hash.php?app=" + appName + "&os=" + this->osName);
 
-    QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
-    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "hash.php?app=" + appName + "&os=" + this->osName ) ) );
-    qDebug() << AppData::Instance()->settings["url"].toString();
-    QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loop.exec();
-
-    QString onlineHash = QString(reply->readAll());
     if(onlineHash != localHash)
     {
-        QString programm = this->appPath("AutoUpdater");
+        QString programm = this->executablePath("AutoUpdater");
         QStringList arguments = QStringList();
         QDir dir = QDir();
         arguments << appName + ".zip" << dir.absolutePath().replace(appName + ".app/Contents/MacOS", "");
@@ -122,4 +113,29 @@ QJsonObject AppData::setItem(QJsonObject dict, QString key, QJsonValue value)
         }
     }
     return newDict;
+}
+
+QString AppData::getStringResponse(QString endPoint){
+    QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
+    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + endPoint ) ) );
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
+    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
+    // which in turn will trigger event loop quit.
+    loop.exec();
+
+    QString response = QString(reply->readAll());
+    return response;
+}
+
+QJsonObject AppData::getJsonResponse(QString endPoint){
+    QString response = AppData::getStringResponse(endPoint);
+
+    QJsonObject obj = QJsonDocument::fromVariant(response).object();
+    return obj;
+}
+
+QNetworkReply AppData::getStringResponseAsync(QString endPoint){
+
 }

@@ -37,7 +37,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void fileDownloaded();
+    void listDownloaded();
     void handleButton();
     void downloadProgCalc(QString remainingTime, QString Speed, int percentage);
     void selectedChange(QString item);
@@ -48,7 +48,7 @@ private slots:
     void feedDownloaded();
 private:
     Ui::MainWindow *ui;
-    FileDownloader* fileDownloader;
+    FileDownloader* listDownloader;
     FileDownloader* hashDownloader;
     FileDownloader* feedDownloader;
     QNetworkAccessManager m_WebCtrl;

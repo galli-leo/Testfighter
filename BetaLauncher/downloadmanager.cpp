@@ -26,7 +26,6 @@ void DownloadManager::start()
     foreach(QUrl url, this->downloadingItems)
     {
        manager->head(QNetworkRequest(url));
-       printf("\nGetting Headers for url: %s", url.toString().toStdString().c_str());
     }
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -74,29 +73,23 @@ void DownloadManager::startDownloading()
 void DownloadManager::downloadProg(qint64 bytesReceived, qint64 bytesTotal)
 {
     this->times++;
-    printf("Bytes total: %i", (int)bytesTotal);
+
     qint64 bytesDiff = bytesReceived - this->lastDlSize;
     this->dlSize += bytesDiff;
     this->lastDlSize = bytesReceived;
-    //int timeDiff = QDateTime::currentMSecsSinceEpoch()/1000-this->time;
+
     double currentTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
     double timeDiff = currentTime-this->lastTimeNice;
     lastDlNice += bytesDiff;
     if(timeDiff!= 0.0 && bytesDiff !=0.0 && lastDlNice != 0)
     {
-        //printf("\nDownloading Speed: %s, dlSize: %s, bytesDiff: %s", QString::number((this->dlSize/timeDiff)).toStdString().c_str(), QString::number(this->dlSize).toStdString().c_str(), QString::number(bytesDiff).toStdString().c_str());
-        qDebug() << "dlll";
         qint64 remainingDl = this->totalSize - this->dlSize;
         qint64 speed = ((lastDlNice/timeDiff)); //Download Speed in B/s
         int remainingTimeSec = 0;
         if(speed !=0)
         remainingTimeSec = remainingDl/speed;
-        qDebug() << "times: " << times;
-        qDebug() << "asdf: " << niceSpeed(speed);
 
-
-        //printf("\nRemaining time: %s, times: %i, percentage: %i", readableTime(remainingTimeSec).toStdString().c_str(), this->times, (this->dlSize/this->totalSize)*100);
-        //We only want every 10th time to update ui
+        //We only want every 2nd time to update ui
         if(this->times >= 2)
         {
 
@@ -115,7 +108,6 @@ void DownloadManager::downloadFinished()
     if(this->currentDownloadIndex == this->downloadingItems.count())
     {
         //WE are done
-        printf("\nFinished downloading all items total dl: %s", QString::number(this->dlSize).toStdString().c_str());
         emit finished();
 
     }

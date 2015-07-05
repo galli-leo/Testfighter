@@ -1,3 +1,6 @@
 <RCC>
-    <qresource prefix="/images"/>
+    <qresource prefix="/images">
+        <file>blueSheet.png</file>
+        <file>button.png</file>
+    </qresource>
 </RCC>

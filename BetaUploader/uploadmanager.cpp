@@ -23,18 +23,17 @@ void UploadManager::start()
     this->lastUlSize = 0;
     this->times = 0;
     lastUlNice = 0;
+
     //Get all headers to get content length
-    qDebug() << "first: " << itemsToUpload.at(0);
     foreach(QString url, this->itemsToUpload)
     {
        QFile file(url);
        file.open(QIODevice::ReadOnly);
-       qDebug() << "lol";
-       qDebug() << url;
        this->totalSize += file.size()+360; //360 is the size of the post request without any file so we have to add it
        file.close();
     }
     qDebug() << "Total size to upload: " << this->totalSize;
+
     this->networkManager = new QNetworkAccessManager(this);
     this->startUpload(0);
     this->time = (double)QDateTime::currentMSecsSinceEpoch()/1000;
@@ -45,11 +44,13 @@ void UploadManager::start()
     timer->start(5000);
 
 }
+
 void UploadManager::update()
 {
     lastUlNice = 0;
     lastTimeNice = (double)QDateTime::currentMSecsSinceEpoch()/1000;
 }
+
 QString UploadManager::readableTime(int secconds)
 {
     //Break into sec min hours days
@@ -96,6 +97,7 @@ QString UploadManager::readableTime(int secconds)
 
 
 }
+
 QString UploadManager::plural(int times, QString base)
 {
     if(times == 1)
@@ -135,77 +137,86 @@ double UploadManager::round(double n, unsigned d)
 
 void UploadManager::startUpload(int index)
 {
-    lastUlSize = 0;
-    QFile *file =  new QFile(this->itemsToUpload.at(index));
-    QUrl url(AppData::Instance()->settings["url"].toString()+"upload_single.php");
-    QNetworkRequest request(url);
-    this->currentFile = file;
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QHttpPart loginPart;
-    /* password */
-    loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
-    loginPart.setBody("testfighter2015");
-    multiPart->append(loginPart);
-    /* os */
-    loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
-    loginPart.setBody(AppData::Instance()->osName.toLatin1());
-    multiPart->append(loginPart);
-    /* path */
-    loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"path\""));
-    loginPart.setBody(this->paths.at(index).toLocal8Bit());
-    qDebug() << this->paths.at(index).toLocal8Bit();
-    multiPart->append(loginPart);
-    QHttpPart filePart;
-    /* important that the files[] variable have the brackets, for PHP to interpret correctly */
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"uploaded\"; filename=\""+ file->fileName() + "\""));
-    qDebug() << "form-data; name=\"file1\"; filename=\""+ file->fileName() + "\"";
-    file->open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+    if(this->itemsToUpload.count() <= index){
+        lastUlSize = 0;
+        QFile *file =  new QFile(this->itemsToUpload.at(index));
+        QUrl url(AppData::Instance()->settings["url"].toString()+"upload_single.php");
+        QNetworkRequest request(url);
+        this->currentFile = file;
 
-    //qDebug() << file->readAll();
-    filePart.setBodyDevice(file);
-    file->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
-    multiPart->append(filePart);
+        QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+        QHttpPart loginPart;
 
+        /* password */
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
+        loginPart.setBody("testfighter2015");
+        multiPart->append(loginPart);
 
+        /* os */
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
+        loginPart.setBody(AppData::Instance()->osName.toLatin1());
+        multiPart->append(loginPart);
 
-    QNetworkReply* reply = networkManager->post(request, multiPart);
-    this->currentReply = reply;
-    multiPart->setParent(reply); // delete the multiPart with the reply
-    QObject::connect(reply,SIGNAL(uploadProgress(qint64,qint64)), this, SLOT(uploadProgress(qint64,qint64)));
-    QObject::connect(reply, SIGNAL(finished()), this, SLOT(finished()));
-    QObject::connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)));
+        /* path */
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"path\""));
+        loginPart.setBody(this->paths.at(index).toLocal8Bit());
+        qDebug() << this->paths.at(index).toLocal8Bit();
+        multiPart->append(loginPart);
+
+        QHttpPart filePart;
+        /* important that the files[] variable have the brackets, for PHP to interpret correctly */
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"uploaded\"; filename=\""+ file->fileName() + "\""));
+        file->open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+        filePart.setBodyDevice(file);
+        file->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
+        multiPart->append(filePart);
+
+        QNetworkReply* reply = networkManager->post(request, multiPart);
+        this->currentReply = reply;
+        multiPart->setParent(reply); // delete the multiPart with the reply
+
+        QObject::connect(reply,SIGNAL(uploadProgress(qint64,qint64)), this, SLOT(uploadProgress(qint64,qint64)));
+        QObject::connect(reply, SIGNAL(finished()), this, SLOT(finished()));
+        QObject::connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)));
+    }else{
+        emit uploadFinished();
+        qWarning() << "There has been an error while uploading: No changes have been made!";
+
+        QMessageBox::critical(0,"Error while uploading", "There has been an error while uploading: No changes have been made");
+    }
 }
+
 void UploadManager::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
 {
     if(bytesSent!=0 && bytesTotal != 0)
     {
-    qDebug() << "Uploaded:" << bytesSent << " bytes of total: " << bytesTotal << "diff to total: " << bytesTotal-this->totalSize;
-    qint64 bytesDiff = bytesSent - this->lastUlSize;
-    this->UlSize += bytesDiff;
-    this->lastUlSize = bytesSent;
-    double currentTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
-    double timeDiff = currentTime-this->lastTimeNice;
-    lastUlNice += bytesDiff;
+        qDebug() << "Uploaded:" << bytesSent << " bytes of total: " << bytesTotal << "diff to total: " << bytesTotal-this->totalSize;
+        qint64 bytesDiff = bytesSent - this->lastUlSize;
+        this->UlSize += bytesDiff;
+        this->lastUlSize = bytesSent;
+        double currentTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
+        double timeDiff = currentTime-this->lastTimeNice;
+        lastUlNice += bytesDiff;
 
-    qDebug() << timeDiff;
-    qDebug() << currentTime;
-    qDebug() << lastTimeNice;
-    if(timeDiff != 0.0){
-        qDebug() << "Uploadspeed: " << ((bytesDiff/timeDiff));
+        if(timeDiff != 0.0){
+            qDebug() << "Uploadspeed: " << ((bytesDiff/timeDiff));
 
-        qint64 remainingUl = this->totalSize - this->UlSize;
-        qint64 speed = ((lastUlNice/timeDiff)); //Download Speed in B/s
-        int remainingTimeSec = remainingUl/speed;
-        qDebug() << "Remaining time: " <<  this->readableTime(remainingTimeSec) << " percentage: " << (this->UlSize/this->totalSize)*100 << " speed: " << this->niceSpeed(speed);
-        float percentage = ((float)this->UlSize/(float)this->totalSize)*100;
-        emit uploadProg(this->niceSpeed(speed), this->readableTime(remainingTimeSec), percentage);
-    }
+            qint64 remainingUl = this->totalSize - this->UlSize;
+            qint64 speed = ((lastUlNice/timeDiff)); //Download Speed in B/s
+            int remainingTimeSec = remainingUl/speed;
+
+            qDebug() << "Remaining time: " <<  this->readableTime(remainingTimeSec) << " percentage: " << (this->UlSize/this->totalSize)*100 << " speed: " << this->niceSpeed(speed);
+
+            float percentage = ((float)this->UlSize/(float)this->totalSize)*100;
+            emit uploadProg(this->niceSpeed(speed), this->readableTime(remainingTimeSec), percentage);
+        }
     }
     qDebug() << "Hello there";
 
     lastTime = (double)QDateTime::currentMSecsSinceEpoch()/1000;
 
 }
+
 void UploadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
     qDebug() << "Bytes received: " << bytesReceived << " of total: " << bytesTotal;
@@ -217,7 +228,6 @@ void UploadManager::finished()
 {
     this->currentUploadIndex++;
     QByteArray data = currentReply->readAll();
-    qDebug() << "DATAAAAAAAAA: " << data;
     QString dataString = QString(data);
     if(!dataString.contains("has been uploaded"))
     {
@@ -228,17 +238,16 @@ void UploadManager::finished()
     }
     else
     {
-    currentReply->deleteLater();
-    if(this->currentUploadIndex >= this->itemsToUpload.count())
-    {
-        qDebug() << "Total time lost: " << totalTime;
-        emit uploadFinished();
+        currentReply->deleteLater();
+        if(this->currentUploadIndex >= this->itemsToUpload.count())
+        {
+            qDebug() << "Total time lost: " << totalTime;
+            emit uploadFinished();
 
-    }
-    else
-    {
-        this->startUpload(this->currentUploadIndex);
-    }
-    qDebug() << this->currentUploadIndex;
+        }
+        else
+        {
+            this->startUpload(this->currentUploadIndex);
+        }
     }
 }

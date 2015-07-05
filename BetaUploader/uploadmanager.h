@@ -31,6 +31,7 @@ public:
     void addItem(QString file);
     void addPath(QString path);
     void start();
+
 private:
     QStringList itemsToUpload;
     QStringList paths;
@@ -53,6 +54,7 @@ private:
     double totalTime;
     qint64 lastUlNice;
     double lastTimeNice;
+
 private slots:
     void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
     void finished();

@@ -7,23 +7,7 @@ UploadWindow::UploadWindow(QWidget *parent) :
 {
     cli = false;
     ui->setupUi(this);
-    QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
-    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "options.json" ) ) );
-    qDebug() << AppData::Instance()->settings["url"].toString();
-    QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loop.exec();
-
-    // Lets print the HTTP GET response.
-    //qDebug( reply->readAll());
-
-    QByteArray optionsData = reply->readAll();
-    QJsonDocument loadDoc = QJsonDocument::fromJson(optionsData);
-    qDebug() << optionsData;
-    this->options = loadDoc.object();
+    this->options = AppData::getJsonResponse("options.json");
     //setupFields();
 
 }
@@ -35,18 +19,7 @@ UploadWindow::~UploadWindow()
 void UploadWindow::startUpload()
 {
     //Get the list for the os we are uploading
-    QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
-    QNetworkReply *replyList = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + this->os+"_list.json" ) ) );
-    qDebug() << os << AppData::Instance()->settings["url"].toString() + this->os+"_list.json";
-    QEventLoop loopList;
-    QObject::connect(replyList, SIGNAL(finished()), &loopList, SLOT(quit()));
-
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loopList.exec();
-
-    QJsonDocument loadDocList = QJsonDocument::fromJson(replyList->readAll());
-    this->list = loadDocList.object();
+    this->list = AppData::getJsonResponse(this->os+"_list.json");
 
     setupFields();
     initUpload();
@@ -71,7 +44,6 @@ void UploadWindow::setupFields()
     qDebug() << dir;
     qDebug() << dirName;
     this->isInit = !this->list.contains(dirName);
-    qDebug() << this->isInit;
     //This is responsible for storing all options according to their type
     QMap<QString, QList<QJsonObject> > optionsSorted;
     //This is responsible for looking up the options in the right order according to their type
@@ -91,16 +63,15 @@ void UploadWindow::setupFields()
         list.append(option);
         optionsSorted.insert(option["Type"].toString(), list);
     }
-    qDebug() << optionsSorted.value("text").at(0);
     int column = 0;
     int row = 0;
     foreach(QString key, lookUpList)
     {
-         QList<QJsonObject> list = optionsSorted.value(key);
-         foreach(QJsonObject json, list)
-         {
+        QList<QJsonObject> list = optionsSorted.value(key);
+        foreach(QJsonObject json, list)
+        {
             addField(json["Type"].toString(), json, row, column);
-         }
+        }
     }
 
 
@@ -112,7 +83,10 @@ void UploadWindow::addField(QString type, QJsonObject field, int &row, int &colu
     {
         return;
     }
+
     QLabel* label = new QLabel(field["Name"].toString()+":", this);
+
+    //CheckBox
     if(type == "yes/no")
     {
         QCheckBox* check = new QCheckBox(this);
@@ -125,11 +99,15 @@ void UploadWindow::addField(QString type, QJsonObject field, int &row, int &colu
             row++;
             column = 0;
 
-        } else
-        column = 1;
+        }
+        else
+        {
+            column = 1;
+        }
         QWidget* widget = (QWidget*)check;
         edits.insert(keyForName(field["Name"].toString()), widget);
-    } else if(type == "text")
+    }
+    else if(type == "text")
     {
         QTextEdit *textEdit = new QTextEdit(this);
         this->ui->formLayout->addRow(label, textEdit);
@@ -160,18 +138,8 @@ void UploadWindow::initUpload()
 
     QDirIterator it(this->dir, QDir::Files, QDirIterator::Subdirectories);
 
-    QNetworkReply *replyHash = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + "builds/hash"+ dirName + ".json" ) ) );
+    hashes = AppData::getJsonResponse("builds/hash"+ dirName + ".json");
 
-    QEventLoop loopHash;
-    QObject::connect(replyHash, SIGNAL(finished()), &loopHash, SLOT(quit()));
-
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loopHash.exec();
-    QByteArray ret = replyHash->readAll();
-    qDebug() << ret;
-    QJsonDocument docHash = QJsonDocument::fromJson(ret);
-    hashes = docHash.object();
     while (it.hasNext()) {
         QString fileL = it.next();
 
@@ -208,13 +176,17 @@ void UploadWindow::initUpload()
         loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
         loginPart.setBody("testfighter2015");
         multiPart->append(loginPart);
+
+        /* files to remove*/
         loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"files\""));
         loginPart.setBody(filesToRemove.toLocal8Bit());
+
         QNetworkReply *replyDel = networkMgr->post( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/builds/remove_files.php" ) ), multiPart );
         multiPart->setParent(replyDel);
         QEventLoop loopDel;
         QObject::connect(replyDel, SIGNAL(finished()), &loopDel, SLOT(quit()));
         loopDel.exec();
+
         qDebug() << replyDel->readAll();
     }
 
@@ -272,27 +244,25 @@ void UploadWindow::buildSubmit()
             if(check == 2)loginPart.setBody("true");
             qDebug() << "Key: " << key << " text: " << check;
         }
-        qDebug() << key;
-        qDebug() << edit->metaObject()->className();
         multiPart->append(loginPart);
     }
-     QHttpPart fileName;
-     fileName.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"filename\""));
+    QHttpPart fileName;
+    fileName.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"filename\""));
 
-     QString dirName = dir.split("/").last();
-     if(dirName == "") // This accounts for urls like /bla/bla/test/
-     {
-         dirName = dir.split("/").at(dir.split("/").count()-2);
+    QString dirName = dir.split("/").last();
+    if(dirName == "") // This accounts for urls like /bla/bla/test/
+    {
+        dirName = dir.split("/").at(dir.split("/").count()-2);
 
-     }
+    }
 
-     qDebug() << dirName.toLocal8Bit();
-     fileName.setBody(dirName.toLocal8Bit());
-     multiPart->append(fileName);
-     QHttpPart osName;
-     osName.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
-     osName.setBody(this->os.toLocal8Bit());
-     multiPart->append(osName);
+    qDebug() << dirName.toLocal8Bit();
+    fileName.setBody(dirName.toLocal8Bit());
+    multiPart->append(fileName);
+    QHttpPart osName;
+    osName.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
+    osName.setBody(this->os.toLocal8Bit());
+    multiPart->append(osName);
 
     qDebug() << multiPart;
     QNetworkAccessManager* networkManager = new QNetworkAccessManager(this);
@@ -338,10 +308,10 @@ QString UploadWindow::hash(QString file)
         }
         else
         {
-        while ((bytesRead = in.read(buf, 2048)) > 0) {
-            overallBytesRead += bytesRead;
-            hash.addData(buf, bytesRead);
-        }
+            while ((bytesRead = in.read(buf, 2048)) > 0) {
+                overallBytesRead += bytesRead;
+                hash.addData(buf, bytesRead);
+            }
         }
         in.close();
 
@@ -378,7 +348,7 @@ void UploadWindow::setField(QString key, QString value)
         textEdit->setChecked(false);
         if (value == "true")
         {
-             textEdit->setChecked(true);
+            textEdit->setChecked(true);
         }
     }
 }

@@ -6,47 +6,41 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
-    appDir = AppData::Instance()->appDirectory;
-    QUrl imageUrl(AppData::Instance()->settings["url"].toString() + AppData::Instance()->osName+"_list.json");
-    fileDownloader = new FileDownloader(imageUrl, this);
+    appDir = AppData::Instance()->docsDirectory;
 
-    connect(fileDownloader, SIGNAL(downloaded()), SLOT(fileDownloaded()));
+    QUrl listUrl(AppData::Instance()->settings["url"].toString() + AppData::Instance()->osName+"_list.json");
+    listDownloader = new FileDownloader(listUrl, this);
+    connect(listDownloader, SIGNAL(downloaded()), SLOT(listDownloaded()));
+
     ui->setupUi(this);
     ui->comboBox->addItem("Loading Items");
-    //ui->pushButton->setEnabled(false);
+
     feedDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "feed/index.php?num=200"), this);
-    qDebug() << AppData::Instance()->settings["url"].toString();
     connect(feedDownloader, SIGNAL(downloaded()), SLOT(feedDownloaded()));
+
     ui->progressBar->setHidden(true);
+
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedChange(QString)));
 
 
 }
-void MainWindow::fileDownloaded()
+void MainWindow::listDownloaded()
 {
-    QByteArray m_DownloadedData = fileDownloader->downloadedData();
-    printf("data: %s\n",fileDownloader->downloadedData().data());
+    QByteArray m_DownloadedData = listDownloader->downloadedData();
     QJsonDocument loadDoc = QJsonDocument::fromJson(m_DownloadedData);
-    //printf(loadDoc.object()["test2"].toObject()["version"].toString().toLocal8Bit().data());
     QStringList Items = loadDoc.object().keys();
-    //Items.removeAt(0);
+
     ui->comboBox->removeItem(0);
     ui->comboBox->addItems(Items);
-    //printf("\n %s", Items.at(0));
+
     QFile loadFile("list.json");
 
+    loadFile.open(QIODevice::ReadWrite);
 
-        printf("File does not exist");
-        loadFile.open(QIODevice::ReadWrite);
-
-
-
-     printf("File does not exist");
-    //QFile loadFile("list.json");
     QByteArray list = loadFile.readAll();
     QJsonDocument loadDoc2(QJsonDocument::fromJson(list));
-    QJsonObject root;
+    QJsonObject newList;
     foreach(QString item, Items)
     {
         QJsonObject itemJ;
@@ -75,29 +69,27 @@ void MainWindow::fileDownloaded()
             foreach(QString key, loadDoc.object()[item].toObject().keys())
             {
                 itemJ[key] = loadDoc.object()[item].toObject()[key];
-                //printf("\nkey: %s", key);
             }
-            //itemJ["installed"] = "false";
         }
-        root[item] = itemJ;
+        newList[item] = itemJ;
     }
-    QJsonDocument writeDoc(root);
+    QJsonDocument writeDoc(newList);
     loadFile.resize(0);
     loadFile.write(writeDoc.toJson());
     loadFile.close();
-    this->list = root;
+    this->list = newList;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
 
     if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
-        ui->label_3->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        ui->desc_label->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
 
     }
     else if(this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
         ui->pushButton->setText("Update");
-        ui->label_3->setText("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+        ui->desc_label->setText("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
     }
     else
     {
@@ -147,15 +139,13 @@ void MainWindow::install(bool updating, QString item)
     QString rootPath;
     rootPath = appDir;
 
-
-
     this->hashDownloader = new FileDownloader(QUrl(AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json"));
     qDebug() << AppData::Instance()->settings["url"].toString() + "builds/hashes/"+AppData::Instance()->osName +"/"+ item + ".json";
     connect(this->hashDownloader, SIGNAL(downloaded()), this, SLOT(hashDownloaded()));
     ui->pushButton->setEnabled(false);
     ui->comboBox->setEnabled(false);
     ui->label->setText("Inizializing");
-    ui->label_3->setText("");
+    ui->desc_label->setText("");
     printf("Installing");
 
 }
@@ -170,20 +160,20 @@ void MainWindow::selectedChange(QString item)
     if(!this->isInstalled((item)))
     {
         ui->pushButton->setText("Install");
-        ui->label_3->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        ui->desc_label->setText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
         ui->pushButton->setEnabled(true);
 
     }
     else if(this->needsUpdateList.contains(item))
     {
         ui->pushButton->setText("Update");
-        ui->label_3->setText("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+        ui->desc_label->setText("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
         ui->pushButton->setEnabled(true);
     }
     else
     {
         ui->pushButton->setText("Launch");
-        ui->label_3->setText("");
+        ui->desc_label->setText("");
         ui->pushButton->setEnabled(true);
     }
 
@@ -212,11 +202,11 @@ void MainWindow::hashDownloaded()
         }
         else
         {
-        qDebug() << "Hash of file: " << fileL << ", " << hash << " online says: " << hashes[relativeFile].toString();
-        if(hash == hashes[relativeFile].toString())
-        {
-            hashes.remove(relativeFile);
-        }
+            qDebug() << "Hash of file: " << fileL << ", " << hash << " online says: " << hashes[relativeFile].toString();
+            if(hash == hashes[relativeFile].toString())
+            {
+                hashes.remove(relativeFile);
+            }
 
         }
     }
@@ -256,10 +246,10 @@ QString MainWindow::hash(QString file)
         }
         else
         {
-        while ((bytesRead = in.read(buf, 2048)) > 0) {
-            overallBytesRead += bytesRead;
-            hash.addData(buf, bytesRead);
-        }
+            while ((bytesRead = in.read(buf, 2048)) > 0) {
+                overallBytesRead += bytesRead;
+                hash.addData(buf, bytesRead);
+            }
         }
         in.close();
 
@@ -272,13 +262,14 @@ QString MainWindow::hash(QString file)
 }
 void MainWindow::downloadManagerFinished()
 {
+/*
 #ifdef Q_OS_MAC
-    QString exePath = AppData::Instance()->appPath( AppData::Instance()->appDirectory + ui->comboBox->currentText());
+    QString exePath = AppData::Instance()->executablePath( AppData::Instance()->docsDirectory + ui->comboBox->currentText());
     QFile file(exePath);
     file.setPermissions(QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner);
     qDebug() << file.permissions();
     qDebug() << exePath;
-#endif
+#endif*/
     ui->progressBar->setHidden(true);
     ui->label->setText("");
     ui->progressBar->setValue(0);
@@ -306,8 +297,8 @@ void MainWindow::downloadManagerFinished()
 }
 bool MainWindow::isInstalled(QString item)
 {
-        qDebug() << (QDir(AppData::Instance()->appDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0? "Installed: true" : "Installed: false");
-        return QDir(AppData::Instance()->appDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
+    qDebug() << (QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0? "Installed: true" : "Installed: false");
+    return QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
 }
 
 MainWindow::~MainWindow()
@@ -340,35 +331,35 @@ void MainWindow::launch()
 
     //gives the filter (e.g. yourapp.exe)
     const QStringList nameFilter( ui->comboBox->currentText()+AppData::Instance()->appExtension);
-    qDebug() << AppData::Instance()->appDirectory + ui->comboBox->currentText() << " " << ui->comboBox->currentText();
+    qDebug() << AppData::Instance()->docsDirectory + ui->comboBox->currentText() << " " << ui->comboBox->currentText();
     //The iterator searching for the file
-    QDirIterator dirIt(AppData::Instance()->appDirectory + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
+    QDirIterator dirIt(AppData::Instance()->docsDirectory + ui->comboBox->currentText(),nameFilter, QDir::NoFilter, QDirIterator::Subdirectories);
     while (dirIt.hasNext()) {
         dirIt.next();
 
-                qDebug()<< "Path" << dirIt.filePath();
-                //Real path for mac apps, windows it is just the exe file, mac it is yourapp.app/Contents/MacOs/yourapp
-                QString realPath = dirIt.filePath();
-                if(dirIt.filePath().contains(".app")){
-                    realPath += "/Contents/MacOS/" + ui->comboBox->currentText();
-                    //realPath = QString("\"") + realPath+ QString("\"");
-                    QFile file(realPath);
-                    //Set the permissions so we are sure we can launch it, dling it usually results in not the right permissions
-                    file.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ReadOwner | QFile::ReadOther | QFile::ReadUser);
-                }
+        qDebug()<< "Path" << dirIt.filePath();
+        //Real path for mac apps, windows it is just the exe file, mac it is yourapp.app/Contents/MacOs/yourapp
+        QString realPath = dirIt.filePath();
+        if(dirIt.filePath().contains(".app")){
+            realPath += "/Contents/MacOS/" + ui->comboBox->currentText();
+            //realPath = QString("\"") + realPath+ QString("\"");
+            QFile file(realPath);
+            //Set the permissions so we are sure we can launch it, dling it usually results in not the right permissions
+            file.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOwner | QFile::ExeUser | QFile::ReadGroup | QFile::ReadOwner | QFile::ReadOther | QFile::ReadUser);
+        }
 
-                launchProc = new QProcess(this);
-                QStringList arguments;
-                arguments << realPath;
-                launchProc->start(realPath, arguments );
-                //QProcess::startDetached(realPath);
-                qDebug() << realPath;
-                //ui->centralWidget->hide();
-                //Show it minimized, so it does not confront app
-                ui->centralWidget->showMinimized();
-                this->showMinimized();
-                this->clearFocus();
-                connect(launchProc, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
+        launchProc = new QProcess(this);
+        QStringList arguments;
+        arguments << realPath;
+        launchProc->start(realPath, arguments );
+        //QProcess::startDetached(realPath);
+        qDebug() << realPath;
+        //ui->centralWidget->hide();
+        //Show it minimized, so it does not confront app
+        ui->centralWidget->showMinimized();
+        this->showMinimized();
+        this->clearFocus();
+        connect(launchProc, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
 
 
 
