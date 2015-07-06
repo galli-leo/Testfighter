@@ -81,7 +81,12 @@ bool AppData::checkForUpdate(QString appName)
         QString programm = this->executablePath("AutoUpdater");
         QStringList arguments = QStringList();
         QDir dir = QDir();
-        arguments << appName + ".zip" << dir.absolutePath().replace(appName + ".app/Contents/MacOS", "");
+        QString path = dir.absolutePath().replace(appName + ".app/Contents/MacOS", "");
+        QChar car('/');
+        if(path.at(path.length()-1) != car){
+            path.append("/");
+        }
+        arguments << appName + ".zip" << path;
         qDebug() << arguments;
         this->settings = setItem(this->settings, "hash", onlineHash);
         QFile file("settings.json");

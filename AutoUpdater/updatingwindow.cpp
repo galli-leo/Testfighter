@@ -17,20 +17,28 @@ UpdatingWindow::~UpdatingWindow()
 
 void UpdatingWindow::startDownload()
 {
-   /* QNetworkAccessManager *networkMgr = new QNetworkAccessManager(this);
-    QNetworkReply *reply = networkMgr->head( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/download_update?file=" + fileToDownload + "&os="+ osName() ) ) );
 
-    QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    QDir dir;
+    QStringList path = pathToDownload.split("/");
+    path.removeLast();
+    QString oldPath = path.join("/")+"_old/";
 
-    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
-    // which in turn will trigger event loop quit.
-    loop.exec();
-    this->dlSize = reply->header(QNetworkRequest::ContentLengthHeader).toInt();
-    qDebug() << "Raw headers: " << reply->rawHeaderList();
-    qDebug() << "DLSIZE:       " << this->dlSize;
-    qDebug() << "Content Type: " << reply->header(QNetworkRequest::ContentTypeHeader);*/
-    //manager = QNetworkAccessManager(this);
+    QString resourcesPath = pathToDownload;
+    if(osName() == "win")
+    {
+        resourcesPath = AppData::Instance()->executablePath(pathToDownload).replace(".exe", "")+ "/";
+    }
+    QDir old(oldPath);
+    dir.mkpath(oldPath);
+    if(!dir.rename(resourcesPath+"settings.json", oldPath+"settings.json"))
+    {
+        qDebug() << "Move failed!" << resourcesPath;
+    }
+    if(!dir.rename(resourcesPath+"list.json", oldPath+"list.json"))
+    {
+        qDebug() << "Move failed!" << resourcesPath+"list.json" << oldPath+"list.json";
+    }
+
     connect(&manager, SIGNAL(finished(QNetworkReply*)),
                 SLOT(fileDownloaded(QNetworkReply*)));
     writeToFile = new QFile(pathToDownload + fileToDownload);
@@ -58,22 +66,12 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     path.removeLast();
     QString oldPath = path.join("/")+"_old/";
     QString exeName = fileToDownload.replace(".zip", "");
-    qDebug() << exeName << AppData::Instance()->appPath(pathToDownload+exeName) << AppData::Instance()->appPath(pathToDownload+exeName).replace(exeName, "").replace(".app", exeName+".app");
+    qDebug() << exeName << AppData::Instance()->executablePath(pathToDownload+exeName) << AppData::Instance()->executablePath(pathToDownload+exeName).replace(exeName, "").replace(".app", exeName+".app");
 
-    QString resourcesPath = AppData::Instance()->appPath(pathToDownload+exeName).replace(exeName, "").replace(".app", exeName+".app");
+    QString resourcesPath = pathToDownload;
     if(osName() == "win")
     {
-        resourcesPath = AppData::Instance()->appPath(pathToDownload).replace(".exe", "")+ "/";
-    }
-    QDir old(oldPath);
-    dir.mkpath(oldPath);
-    if(!dir.rename(resourcesPath+"settings.json", oldPath+"settings.json"))
-    {
-        qDebug() << "Move failed!" << resourcesPath;
-    }
-    if(!dir.rename(resourcesPath+"list.json", oldPath+"list.json"))
-    {
-        qDebug() << "Move failed!" << resourcesPath+"list.json" << oldPath+"list.json";
+        resourcesPath = AppData::Instance()->executablePath(pathToDownload).replace(".exe", "")+ "/";
     }
 
 
@@ -99,22 +97,41 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     qDebug() << program;
     myProcess->setProcessChannelMode(QProcess::MergedChannels);
     myProcess->start(program, arguments);
+    sleep(10);
     myProcess->waitForFinished(-1);
     //qDebug() << myProcess->program() << myProcess->arguments().at(3);
     qDebug() << myProcess->readAll();
     if (QFile::exists(resourcesPath+"settings.json"))
     {
-        QFile::remove(resourcesPath+"settings.json");
+        if(QFile::remove(resourcesPath+"settings.json")){
+            qDebug() << "removed settings.json";
+        }
+
     }
     if (QFile::exists(resourcesPath+"list.json"))
     {
         QFile::remove(resourcesPath+"list.json");
     }
+
+    qDebug() << resourcesPath;
+    qDebug() << oldPath;
     QFile file(oldPath+"settings.json");
-    file.rename(resourcesPath+"settings.json");
+    if(!file.rename(resourcesPath+"settings.json")){
+        qWarning() << "Settings.json move failed!!!";
+    }
     QFile file2(oldPath+"list.json");
     file2.rename(resourcesPath+"list.json");
-    old.removeRecursively();
+    //old.removeRecursively();
+
+    if(writeToFile->remove()){
+        qDebug() << "Removed Zip File";
+        QDir macJunkDir(pathToDownload + "__MACOSX");
+        macJunkDir.removeRecursively();
+        writeToFile->close();
+    } else {
+        qDebug() << "Failed to remove zip file";
+    }
+
     this->ui->label->setText("Done!");
     this->ui->progressBar->setValue(120);
     QString execPath;
@@ -122,9 +139,10 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     {
         QProcess::execute(QString("chmod +x %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ + ".app/Contents/MacOS/" + fileToDownload.replace(".zip", "")));
         QProcess::execute(QString("chmod +x %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app"));
-        execPath = QString("open %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app");//"open " + pathToDownload + fileToDownload.replace(".zip", "")+ ".app";// + ".app/Contents/MacOS/" + fileToDownload.replace(".zip", "");
+        execPath = QString("open %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app");
+        system(execPath.toLatin1());
     }else if(osName()=="win"){
-        execPath = AppData::Instance()->appPath("start " +pathToDownload+"BetaUploader");
+        execPath = AppData::Instance()->executablePath("start " +pathToDownload+"BetaUploader");
         system(execPath.toLatin1());
     }
     QProcess::startDetached(execPath);
@@ -137,13 +155,11 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
 
 void UpdatingWindow::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    qlonglong test = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
-    qDebug() << reply->header(QNetworkRequest::ContentLengthHeader);
-    qDebug() << test;
-    float percent = (float)bytesReceived/test;
+    qlonglong contentLength = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
+    float percent = (float)bytesReceived/contentLength;
     this->ui->progressBar->setValue(percent*100);
-    QString string = "Downloading (" + QString::number(bytesReceived/1000) + "/" + QString::number(test/1000) + "kB)";
-    qDebug() << "Downloading (" + QString::number(bytesReceived/1000) + "/" + QString::number(test/1000) + "kB)";
+    QString string = "Downloading (" + QString::number(bytesReceived/1000) + "/" + QString::number(contentLength/1000) + "kB)";
+    qDebug() << "Downloading (" + QString::number(bytesReceived/1000) + "/" + QString::number(contentLength/1000) + "kB)";
     this->ui->label->setText(string);
 }
 

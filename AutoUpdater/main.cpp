@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     int i = 0;
     UpdatingWindow w;
     //CMD options: [fileToDownload] [pathToDowload]
-    w.fileToDownload = "BetaLauncher.zip";
+    w.fileToDownload = "Testfighter.zip";
     w.pathToDownload = "/Users/leonardogalli/beta_test/";
     foreach(QString str, cmdline_args)
     {

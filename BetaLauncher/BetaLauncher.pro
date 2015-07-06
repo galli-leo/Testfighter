@@ -33,3 +33,5 @@ RESOURCES += \
 
 DISTFILES += \
     ../shared/settings.json
+
+QMAKE_INFO_PLIST +=  $${TARGET}/data/default.plist
