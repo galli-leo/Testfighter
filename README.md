@@ -48,3 +48,7 @@ Installation
 2. Go to Contents/MacOS and open the settings.json
 3. Edit the url entry to point to: "http://yourdomain.com/path/to/the/server/folder/" (for the Uploader client also change the password you set in the server)
 4. Distribute!
+
+#####All Clients
+- Your beta testers just need to unzip them and put them in a convinient location.
+- You also need to upload any updates yourself. (Although changing the settings.json is not required anymore.) You can do this by uploading the zipped releases to "/path/to/server/folder/builds/apps/os_short_name/".
