@@ -11,7 +11,7 @@ Features
 #####Key Features:
 
 - Upload a beta version of your app / game using an easy to use UI
-- Only new / changed files get uploaded so you do not have to upload a 2-5 GB patch if you work on a medium sized game
+- Only new / changed files get uploaded so you do not have to upload a 2-5 GB patch if you work on a medium sized game. (__Note for UE4:__ It is best if you disable PAK files. This way you only upload changed / new uassets.)
 - Also only new / changed files get downloaded
 - Distribute the Launcher to your clients without needing to compile anything
 - Expanding with more options (e.g. Should steam be present for game) is simple 
