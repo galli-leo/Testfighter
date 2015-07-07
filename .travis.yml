@@ -1,12 +1,13 @@
 install:
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
  #- sudo add-apt-repository --yes ppa:ci-train-ppa-service/landing-012
- #- sudo apt-get update -qq
+ - sudo apt-get update -qq
  #- sudo apt-get install qtbase-opensource-src qtdeclarative-opensource-src qtwebkit-opensource-src
+ - sudo apt-get install qtdeclarative5-dev
  #- sudo apt-get install qttools-opensource-src
  #- sudo apt-get install php5
 #  - sudo apt-cache search qt5
-  - sudo apt-get install qtcreator
+  #- sudo apt-get install qtcreator
 
 script:
   - cd BetaLauncher
@@ -16,7 +17,7 @@ script:
   - cd BetaUploader
   - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaUploader.pro
   - make
-  - ls
-  - cd ../
-  - cd server
-  - php *.php
+  #- ls
+  #- cd ../
+  #- cd server
+  #- php *.php
