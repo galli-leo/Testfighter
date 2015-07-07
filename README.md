@@ -27,6 +27,12 @@ Features
 - Stats
 - Maybe iOS and Android compability
 
+#####Known Limitations
+- The display name of an application is the one of the folder you are uploading.
+- The executable files must have the exact same name as the display name. (e.g. Folder name is YourGame, the executable must be named YourGame.exe, YourGame.app)
+- At the moment .app applications need to be placed into a folder to be uploaded.
+- Updates must be uploaded by you to your server
+
 Installation
 ------------
 #####Server
