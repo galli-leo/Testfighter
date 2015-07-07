@@ -140,7 +140,3 @@ QJsonObject AppData::getJsonResponse(QString endPoint){
     QJsonObject obj = QJsonDocument::fromVariant(response).object();
     return obj;
 }
-
-QNetworkReply AppData::getStringResponseAsync(QString endPoint){
-
-}

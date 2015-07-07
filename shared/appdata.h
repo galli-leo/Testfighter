@@ -75,12 +75,6 @@ public:
      */
     static QJsonObject getJsonResponse(QString endPoint);
 
-    /*
-     * Gets a string response from endPoint.
-     * Runs asynchronously.
-     */
-    static QNetworkReply getStringResponseAsync(QString endPoint);
-
 signals:
     void gotStringResponse();
 
