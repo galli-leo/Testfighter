@@ -11,6 +11,7 @@ install:
   #- sudo apt-get install qtcreator
 
 script:
+  - qmake --version
   - cd BetaLauncher
   - qmake "QT += widgets core gui network" "INCLUDEPATH += $$PWD/../shared" BetaLauncher.pro
   - make
