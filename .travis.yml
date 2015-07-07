@@ -5,6 +5,7 @@ install:
  #- sudo apt-get install qtbase-opensource-src qtdeclarative-opensource-src qtwebkit-opensource-src
  #- sudo apt-get install qtdeclarative5-dev
  - sudo apt-get install qt54declarative qt54base qt54creator
+ - sudo sh /opt/qt54/bin/qt54-env.sh
  #- sudo apt-get install qttools-opensource-src
  #- sudo apt-get install php5
 #  - sudo apt-cache search qt5
