@@ -38,7 +38,7 @@ AppData::AppData(QObject *parent) : QObject(parent)
 
 #elif defined(Q_OS_LINUX)
     osName = "linux";
-    appDirectory = QCoreApplication::applicationFilePath() + "Apps/";
+    docsDirectory = QCoreApplication::applicationFilePath() + "Apps/";
 #endif
 
     QDir dir(docsDirectory);

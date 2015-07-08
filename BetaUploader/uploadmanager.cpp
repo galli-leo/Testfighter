@@ -137,7 +137,7 @@ double UploadManager::round(double n, unsigned d)
 
 void UploadManager::startUpload(int index)
 {
-    if(this->itemsToUpload.count() <= index){
+    if(index < this->itemsToUpload.count()){
         lastUlSize = 0;
         QFile *file =  new QFile(this->itemsToUpload.at(index));
         QUrl url(AppData::Instance()->settings["url"].toString()+"upload_single.php");

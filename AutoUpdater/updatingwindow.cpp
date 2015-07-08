@@ -97,7 +97,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     qDebug() << program;
     myProcess->setProcessChannelMode(QProcess::MergedChannels);
     myProcess->start(program, arguments);
-    sleep(10);
+    //sleep(10);
     myProcess->waitForFinished(-1);
     //qDebug() << myProcess->program() << myProcess->arguments().at(3);
     qDebug() << myProcess->readAll();
