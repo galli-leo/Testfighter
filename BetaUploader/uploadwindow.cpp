@@ -190,6 +190,8 @@ void UploadWindow::initUpload()
         qDebug() << replyDel->readAll();
     }
 
+
+
     uploadManager->start();
 }
 void UploadWindow::uploadFin()

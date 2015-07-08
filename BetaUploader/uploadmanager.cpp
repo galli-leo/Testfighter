@@ -24,6 +24,8 @@ void UploadManager::start()
     this->times = 0;
     lastUlNice = 0;
 
+    qDebug() << "Files to upload: " << this->itemsToUpload << this->paths;
+
     //Get all headers to get content length
     foreach(QString url, this->itemsToUpload)
     {
@@ -238,6 +240,7 @@ void UploadManager::finished()
     }
     else
     {
+        qDebug() << "Message from Server: " << data;
         currentReply->deleteLater();
         if(this->currentUploadIndex >= this->itemsToUpload.count())
         {
