@@ -20,6 +20,7 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include <QJsonValueRef>
+#include <QScrollBar>
 #include "downloadmanager.h"
 #include "filedownloader.h"
 #include "appdata.h"
@@ -62,6 +63,7 @@ private:
     void launch();
     QString appDir;
     QProcess* launchProc;
+    void setDescription(QString text);
 };
 
 #endif // MAINWINDOW_H

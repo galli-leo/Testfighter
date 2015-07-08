@@ -83,14 +83,16 @@ void MainWindow::listDownloaded()
     if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
-        ui->desc_label->setPlainText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        this->setDescription(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+
 
 
     }
     else if(this->needsUpdateList.contains(ui->comboBox->currentText()))
     {
         ui->pushButton->setText("Update");
-        ui->desc_label->setPlainText("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+        this->setDescription("Changelog:\n" + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+
     }
     else
     {
@@ -146,7 +148,8 @@ void MainWindow::install(bool updating, QString item)
     ui->pushButton->setEnabled(false);
     ui->comboBox->setEnabled(false);
     ui->label->setText("Inizializing");
-    ui->desc_label->setPlainText("");
+    this->setDescription("");
+
     printf("Installing");
 
 }
@@ -161,24 +164,31 @@ void MainWindow::selectedChange(QString item)
     if(!this->isInstalled((item)))
     {
         ui->pushButton->setText("Install");
-        ui->desc_label->setPlainText(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+        this->setDescription(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
+
         ui->pushButton->setEnabled(true);
 
     }
     else if(this->needsUpdateList.contains(item))
     {
         ui->pushButton->setText("Update");
-        ui->desc_label->setPlainText("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+        this->setDescription("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
+
         ui->pushButton->setEnabled(true);
     }
     else
     {
         ui->pushButton->setText("Launch");
-        ui->desc_label->setPlainText("");
+        this->setDescription("");
         ui->pushButton->setEnabled(true);
     }
 
 }
+
+void MainWindow::setDescription(QString text){
+    ui->desc_label->setText(text);
+}
+
 void MainWindow::hashDownloaded()
 {
     QByteArray m_DownloadedData = hashDownloader->downloadedData();
