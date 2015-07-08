@@ -135,8 +135,15 @@ QString AppData::getStringResponse(QString endPoint){
 }
 
 QJsonObject AppData::getJsonResponse(QString endPoint){
-    QString response = AppData::getStringResponse(endPoint);
+    QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
+    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + endPoint ) ) );
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 
-    QJsonObject obj = QJsonDocument::fromVariant(response).object();
+    // Execute the event loop here, now we will wait here until readyRead() signal is emitted
+    // which in turn will trigger event loop quit.
+    loop.exec();
+
+    QJsonObject obj = QJsonDocument::fromJson(reply->readAll()).object();
     return obj;
 }
