@@ -165,13 +165,14 @@ void UploadWindow::initUpload()
     foreach(QString key, hashes.keys())
     {
 
-        filesToRemove + key + ";";
+        filesToRemove = filesToRemove + key + ";";
 
     }
     qDebug() << filesToRemove;
+    qDebug() << hashes;
     if(filesToRemove != "")
     {
-        qDebug() << "Files to remove: " << filesToRemove;
+        qDebug() << "Files to remove: " << filesToRemove.toLocal8Bit();
         QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
         QHttpPart loginPart;
         /* password */
@@ -182,8 +183,14 @@ void UploadWindow::initUpload()
         /* files to remove*/
         loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"files\""));
         loginPart.setBody(filesToRemove.toLocal8Bit());
+        multiPart->append(loginPart);
 
-        QNetworkReply *replyDel = networkMgr->post( QNetworkRequest( QUrl( "http://leonardogalli.ch/beta/builds/remove_files.php" ) ), multiPart );
+        /* os */
+        loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"os\""));
+        loginPart.setBody(this->os.toLocal8Bit());
+        multiPart->append(loginPart);
+
+        QNetworkReply *replyDel = networkMgr->post( QNetworkRequest( QUrl(AppData::Instance()->settings["url"].toString() + "remove_files.php" ) ), multiPart );
         multiPart->setParent(replyDel);
         QEventLoop loopDel;
         QObject::connect(replyDel, SIGNAL(finished()), &loopDel, SLOT(quit()));

@@ -110,7 +110,7 @@ down-arrow {image: url(noimg); border-width: 0px; width: 0px;}*/</string>
      <string>Select an App</string>
     </property>
    </widget>
-   <widget class="QLabel" name="desc_label">
+   <widget class="QLabel" name="desc_label2">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -139,7 +139,29 @@ down-arrow {image: url(noimg); border-width: 0px; width: 0px;}*/</string>
      </rect>
     </property>
     <property name="text">
-     <string>Launch</string>
+     <string>PushButton</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="desc_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>180</y>
+      <width>201</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0,0,0,0)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="backgroundVisible">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
