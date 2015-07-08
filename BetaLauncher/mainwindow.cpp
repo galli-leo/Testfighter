@@ -364,7 +364,7 @@ void MainWindow::launch()
         this->clearFocus();
         connect(launchProc, SIGNAL(finished(int , QProcess::ExitStatus )), this, SLOT(launchFinished(int,QProcess::ExitStatus)));
 
-
+        break;
 
 
     }
