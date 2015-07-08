@@ -41,7 +41,8 @@ Installation
 2. Open the upload_single.php
 3. Edit the line: `if($_POST["password"]=="testfighter2015")` and change 'testfighter2015' to a password of your choice
 4. In a Browser go to http://yourdomain.com/path/to/the/server/folder/remove_placeholders.php
-5. Finished!
+5. If your webserver does not support a user ini file in php change upload_max_filesize in your php.ini to something big. (500M should work fine)
+6. Finished!
 
 #####Windows Clients
 1. Unzip the Windows release
