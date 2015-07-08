@@ -15,7 +15,7 @@ Features
 - Also only new / changed files get downloaded
 - Distribute the Launcher to your clients without needing to compile anything
 - Expanding with more options (e.g. Should steam be present for game) is simple 
-- Auto updating to latest versions (still needs more testing)
+- Auto updating to latest versions (still needs more testing on windows)
 - Display of latest releases and updates in a feed
 - CLI Interface for scripting
 
