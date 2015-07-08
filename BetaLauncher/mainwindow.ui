@@ -155,7 +155,8 @@ down-arrow {image: url(noimg); border-width: 0px; width: 0px;}*/</string>
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgba(0,0,0,0)</string>
+     <string notr="true">background-color: rgba(0,0,0,0);
+border: 0px;</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

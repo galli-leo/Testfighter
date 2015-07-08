@@ -33,12 +33,12 @@ AppData::AppData(QObject *parent) : QObject(parent)
 #elif defined(Q_OS_WIN32)
     appExtension = ".exe";
     osName = "win";
-    docsDirectory = QCoreApplication::applicationFilePath() + "Apps/";
+    docsDirectory = QCoreApplication::applicationDirPath() + "/Apps/";
 
 
 #elif defined(Q_OS_LINUX)
     osName = "linux";
-    docsDirectory = QCoreApplication::applicationFilePath() + "Apps/";
+    docsDirectory = QCoreApplication::applicationDirPath() + "/Apps/";
 #endif
 
     QDir dir(docsDirectory);
