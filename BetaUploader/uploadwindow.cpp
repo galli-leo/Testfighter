@@ -138,7 +138,7 @@ void UploadWindow::initUpload()
 
     QDirIterator it(this->dir, QDir::Files, QDirIterator::Subdirectories);
 
-    hashes = AppData::getJsonResponse("builds/hash"+ dirName + ".json");
+    hashes = AppData::getJsonResponse("builds/hashes/"+ AppData::Instance()->osName + "/" + dirName + ".json");
 
     while (it.hasNext()) {
         QString fileL = it.next();
@@ -146,7 +146,8 @@ void UploadWindow::initUpload()
         QFile file(fileL);
         QFileInfo info(file);
         QString folderName = info.absolutePath();
-        QString fileT = folderName.replace(dirName, "|||");
+        QString newStr("|||");
+        QString fileT = folderName.replace(folderName.indexOf(dirName), folderName.indexOf(newStr));
         QString path = dirName + fileT.split("|||").last() + "/";
         qDebug() << "local file: " << fileL;
         qDebug() <<  "hash of local file: " << hash(fileL);
@@ -277,6 +278,8 @@ void UploadWindow::buildSubmit()
     // which in turn will trigger event loop quit.
     loop.exec();
     qDebug() << reply->readAll();
+
+    close();
 
 }
 QString UploadWindow::keyForName(QString name)
