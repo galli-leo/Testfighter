@@ -147,7 +147,7 @@ void UploadWindow::initUpload()
         QFileInfo info(file);
         QString folderName = info.absolutePath();
         QString newStr("|||");
-        QString fileT = folderName.replace(folderName.indexOf(dirName), folderName.indexOf(newStr));
+        QString fileT = folderName.replace(folderName.indexOf(dirName), dirName.size(), newStr);
         QString path = dirName + fileT.split("|||").last() + "/";
         qDebug() << "local file: " << fileL;
         qDebug() <<  "hash of local file: " << hash(fileL);
@@ -171,6 +171,7 @@ void UploadWindow::initUpload()
     qDebug() << filesToRemove;
     if(filesToRemove != "")
     {
+        qDebug() << "Files to remove: " << filesToRemove;
         QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
         QHttpPart loginPart;
         /* password */
