@@ -156,7 +156,7 @@ color: rgb(255, 255, 255);*/
      <string>Select an App</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="desc_label">
     <property name="geometry">
      <rect>
       <x>20</x>
