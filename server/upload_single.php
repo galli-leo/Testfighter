@@ -1,9 +1,9 @@
 <?php 
-
+require_once 'config.php';
 
 ini_set('display_errors',1);
 
-if($_POST["password"]=="testfighter2015"){
+if($_POST["password"]==$CONFIG["password"]){
 	$os = $_POST["os"];
 $target = "builds/$os/";
 

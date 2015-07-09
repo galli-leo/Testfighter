@@ -1,6 +1,6 @@
 <?php
+	require_once 'config.php';
 ini_set('display_errors',1);
-
 
 function doesDirectoryOnlyContainEmptyFolders($path) {
   if(is_dir($path)) {
@@ -65,7 +65,7 @@ function deleteEmptyFoldersRecursivelyUpAndDown($path) {
   }
 }	
 
-if($_POST["password"]=="testfighter2015"){
+if($_POST["password"]==$CONFIG["password"]){
 	echo("test");
 	$os = $_POST["os"];
 	$files_str = $_POST['files'];
