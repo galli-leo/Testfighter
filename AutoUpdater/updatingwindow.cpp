@@ -121,7 +121,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
     }
     QFile file2(oldPath+"list.json");
     file2.rename(resourcesPath+"list.json");
-    //old.removeRecursively();
+    old.removeRecursively();
 
     if(writeToFile->remove()){
         qDebug() << "Removed Zip File";
