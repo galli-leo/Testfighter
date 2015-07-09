@@ -31,3 +31,4 @@ Makefile*
 *.qmlproject.user
 *.qmlproject.user.*
 !7za.exe
+*.DS_Store
