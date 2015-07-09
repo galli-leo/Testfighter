@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    if(AppData::Instance()->checkForUpdate("BetaLauncher"))
+    if(AppData::Instance()->checkForUpdate("BetaUploader"))
     {
         return 0;
     }
