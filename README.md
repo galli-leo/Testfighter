@@ -52,4 +52,4 @@ Installation
 
 #####All Clients
 - Your beta testers just need to unzip them and put them in a convinient location.
-- You also need to upload any updates yourself. (Although changing the settings.json is not required anymore.) You can do this by uploading the zipped releases to "/path/to/server/folder/builds/apps/os_short_name/".
+- You also need to upload any updates yourself. (Although changing the settings.json is not required anymore.) You can do this by uploading the zipped releases (without the os name suffix) to "/path/to/server/folder/builds/apps/os_short_name/".
