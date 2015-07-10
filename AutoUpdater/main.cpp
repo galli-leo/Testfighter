@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
     int i = 0;
     UpdatingWindow w;
     //CMD options: [fileToDownload] [pathToDowload]
-    w.fileToDownload = "BetaUploader.zip";
-    w.pathToDownload = "L:/Github/Testfighter/build-BetaUploader-Desktop_Qt_5_4_1_MSVC2013_64bit-Debug/debug";
+    w.fileToDownload = "Testfighter.zip";
+    w.pathToDownload = "L:/Github/Testfighter/build-BetaLauncher-Desktop_Qt_5_4_1_MSVC2013_64bit-Debug/debug/";
     foreach(QString str, cmdline_args)
     {
         qDebug() << str;

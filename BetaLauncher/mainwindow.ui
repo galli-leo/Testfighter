@@ -136,6 +136,9 @@ down-arrow {image: url(noimg); border-width: 0px; width: 0px;}*/</string>
      <string notr="true">border: 0px;
 background-color: rgba(0,0,0,0);</string>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
  </widget>
