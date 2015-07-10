@@ -143,7 +143,7 @@ void UpdatingWindow::fileDownloaded(QNetworkReply* pReply)
         execPath = QString("open %1").arg(pathToDownload + fileToDownload.replace(".zip", "")+ ".app");
         system(execPath.toLatin1());
     }else if(osName()=="win"){
-        execPath = AppData::Instance()->executablePath("start " +pathToDownload+"BetaUploader");
+        execPath = AppData::Instance()->executablePath("start " +pathToDownload+fileToDownload.replace(".zip", ".exe"));
         system(execPath.toLatin1());
     }
     QProcess::startDetached(execPath);
