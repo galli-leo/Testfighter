@@ -151,7 +151,7 @@ void UploadManager::startUpload(int index)
 
         /* password */
         loginPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"password\""));
-        loginPart.setBody("testfighter2015");
+        loginPart.setBody(AppData::Instance()->settings["pass"].toString().toLocal8Bit());
         multiPart->append(loginPart);
 
         /* os */
