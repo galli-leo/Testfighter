@@ -120,6 +120,23 @@ QJsonObject AppData::setItem(QJsonObject dict, QString key, QJsonValue value)
     return newDict;
 }
 
+void AppData::setDictItem(QJsonObject &dict, QString key, QJsonValue value)
+{
+    QJsonObject newDict;
+    foreach(QString keyDict, dict.keys())
+    {
+        if(keyDict == key)
+        {
+            newDict[key] = value;
+        }
+        else
+        {
+            newDict[keyDict] = dict[keyDict];
+        }
+    }
+    dict = newDict;
+}
+
 QString AppData::getStringResponse(QString endPoint){
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
     QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( AppData::Instance()->settings["url"].toString() + endPoint ) ) );

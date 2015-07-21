@@ -62,6 +62,12 @@ public:
      *
      */
     QJsonObject setItem(QJsonObject dict, QString key, QJsonValue value);
+	
+	/*
+    * Helper function for setting an item in a QJsonObject. (Currently QJsonObjects cannot be written to.)
+    *
+    */
+	void setDictItem(QJsonObject &dict, QString key, QJsonValue value);
 
     /*
      * Gets a string response from endpoint.

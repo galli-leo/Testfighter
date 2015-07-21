@@ -53,7 +53,7 @@ void MainWindow::listDownloaded()
             itemJ = loadDoc2.object()[item].toObject();
             if(itemJ["time"] != loadDoc.object()[item].toObject()["time"])
             {
-                //itemJ["bNeedsUpdate"] = "true";
+                AppData::Instance()->setDictItem(itemJ, "bNeedsUpdate", "true");
                 this->needsUpdateList.append(item);
                 qDebug() << "TIME: " <<  loadDoc.object()[item] << loadDoc.object()[item].toObject()["time"].toString();
                 this->times.insert(item, QString::number(loadDoc.object()[item].toObject()["time"].toInt()));
@@ -79,7 +79,8 @@ void MainWindow::listDownloaded()
     loadFile.close();
     this->list = newList;
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-
+	this->selectedChange(ui->comboBox->currentText());
+	/*
     if(!this->isInstalled((ui->comboBox->currentText())))
     {
         ui->pushButton->setText("Install");
@@ -97,7 +98,7 @@ void MainWindow::listDownloaded()
     else
     {
         ui->pushButton->setEnabled(true);
-    }
+    }*/
 }
 void MainWindow::feedDownloaded()
 {
@@ -296,8 +297,11 @@ void MainWindow::downloadManagerFinished()
 
 
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
-    item = AppData::Instance()->setItem(item, "time", this->times[ui->comboBox->currentText()].toInt());
-    this->list = AppData::Instance()->setItem(this->list, ui->comboBox->currentText(), item);
+    AppData::Instance()->setDictItem(item, "time", this->times[ui->comboBox->currentText()].toInt());
+	AppData::Instance()->setDictItem(item, "isInstalled", "true");
+	AppData::Instance()->setDictItem(item, "bNeedsUpdate", "false");
+    AppData::Instance()->setDictItem(this->list, ui->comboBox->currentText(), item);
+	
     qDebug() << this->list << this->list[ui->comboBox->currentText()] << this->list[ui->comboBox->currentText()].toObject()["times"] << this->times[ui->comboBox->currentText()];
     QFile loadFile("list.json");
 
@@ -306,12 +310,18 @@ void MainWindow::downloadManagerFinished()
     loadFile.resize(0);
     loadFile.write(writeDoc.toJson());
     loadFile.close();
+	
+	if(this->shouldAutoStart){
+		this->launch();
+	}
 
 }
 bool MainWindow::isInstalled(QString item)
 {
     qDebug() << (QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0? "Installed: true" : "Installed: false");
-    return QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
+    //return QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
+	QJsonObject curItem = this->list[item].toObject();
+	return curItem["isInstalled"];
 }
 
 MainWindow::~MainWindow()
