@@ -55,7 +55,7 @@ private:
     QNetworkAccessManager m_WebCtrl;
     QJsonObject list;
     bool isInstalled(QString item);
-	bool shouldAutoStart = false;
+	bool shouldAutoStart;
     QStringList needsUpdateList;
     QHash<QString,QString> times;
     QByteArray dlListData;

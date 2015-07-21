@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton, SIGNAL(pressed()), this, SLOT(handleButton()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedChange(QString)));
 
+	this->shouldAutoStart = false;
 
 }
 void MainWindow::listDownloaded()
