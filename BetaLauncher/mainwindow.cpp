@@ -71,6 +71,7 @@ void MainWindow::listDownloaded()
             {
                 itemJ[key] = loadDoc.object()[item].toObject()[key];
             }
+			itemJ["isInstalled"] = "false";
         }
         newList[item] = itemJ;
     }
@@ -322,7 +323,7 @@ bool MainWindow::isInstalled(QString item)
     qDebug() << (QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0? "Installed: true" : "Installed: false");
     //return QDir(AppData::Instance()->docsDirectory + item).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() != 0;
 	QJsonObject curItem = this->list[item].toObject();
-	return curItem["isInstalled"];
+	return curItem["isInstalled"].toString() == "true" ? true : false;
 }
 
 MainWindow::~MainWindow()
