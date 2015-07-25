@@ -32,3 +32,5 @@ Makefile*
 *.qmlproject.user.*
 !7za.exe
 *.DS_Store
+
+server/JumpNoMore.json
