@@ -168,7 +168,7 @@ void MainWindow::selectedChange(QString item)
     {
         ui->pushButton->setText("Install");
         this->setDescription(this->list[ui->comboBox->currentText()].toObject()["description"].toString());
-
+        ui->autoLaunch->setVisible(true);
         ui->pushButton->setEnabled(true);
 
     }
@@ -176,13 +176,14 @@ void MainWindow::selectedChange(QString item)
     {
         ui->pushButton->setText("Update");
         this->setDescription("Changelog: " + this->list[ui->comboBox->currentText()].toObject()["changelog"].toString());
-
+        ui->autoLaunch->setVisible(true);
         ui->pushButton->setEnabled(true);
     }
     else
     {
         ui->pushButton->setText("Launch");
         this->setDescription("");
+        ui->autoLaunch->setVisible(false);
         ui->pushButton->setEnabled(true);
     }
 
@@ -313,7 +314,7 @@ void MainWindow::downloadManagerFinished()
     loadFile.write(writeDoc.toJson());
     loadFile.close();
 	
-	if(this->shouldAutoStart){
+    if(this->ui->autoLaunch->isChecked()){
 		this->launch();
 	}
 
