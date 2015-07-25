@@ -140,39 +140,18 @@ background-color: rgba(0,0,0,0);</string>
      <bool>true</bool>
     </property>
    </widget>
-<<<<<<< HEAD
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>210</y>
-      <width>211</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>Auto Launch</string>
-    </property>
-    <property name="tristate">
-     <bool>false</bool>
-    </property>
-=======
    <widget class="QCheckBox" name="autoLaunch">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>120</x>
       <y>70</y>
-      <width>81</width>
+      <width>101</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>Auto Launch</string>
     </property>
->>>>>>> origin/master
    </widget>
   </widget>
  </widget>
