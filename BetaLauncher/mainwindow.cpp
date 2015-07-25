@@ -295,7 +295,7 @@ void MainWindow::downloadManagerFinished()
     ui->pushButton->setEnabled(true);
     ui->comboBox->setEnabled(true);
     this->needsUpdateList.removeAt(this->needsUpdateList.indexOf(ui->comboBox->currentText()));
-    this->selectedChange(ui->comboBox->currentText());
+
 
 
     QJsonObject item = this->list[ui->comboBox->currentText()].toObject();
@@ -304,6 +304,8 @@ void MainWindow::downloadManagerFinished()
 	AppData::Instance()->setDictItem(item, "bNeedsUpdate", "false");
     AppData::Instance()->setDictItem(this->list, ui->comboBox->currentText(), item);
 	
+    this->selectedChange(ui->comboBox->currentText());
+
     qDebug() << this->list << this->list[ui->comboBox->currentText()] << this->list[ui->comboBox->currentText()].toObject()["times"] << this->times[ui->comboBox->currentText()];
     QFile loadFile("list.json");
 
